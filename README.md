@@ -60,8 +60,10 @@ All the information provided here is taken from Apple`s [Secure Enclave page](ht
 | 14 Pro, 14 Pro Max, 15, 15 Plus | A16 Bionic | not explicitly mentioned | Yes
 | 15 Pro, 15 Pro Max    | A17 Pro  |   not explicitly mentioned | Yes
 
-##### iMac
-coming soon
+
+##### iMac and MacBook
+The wrapper supports Macs with an Apple Silicon processor or Macs with an Intel processor that have a [T2 security chip](https://support.apple.com/en-us/103265 "T2 security chip").
+The same also applies to MacBooks. In addition, the MacBook Pro 2016 and 2017, which have Touch Bar (these have a T1 security chip), are also supported.
 
 # 
 
