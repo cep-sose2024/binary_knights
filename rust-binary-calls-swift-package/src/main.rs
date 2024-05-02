@@ -1,21 +1,18 @@
+#[allow(warnings)]
 fn main() {
-    println!("hello from Rust...");
-    let _num = ffi::hello_swift(); 
+    let pubKey: String = "1234".to_string(); 
+    let privKey: String = "3344".to_string(); 
+    println!("{}", ffi::rustcall_generateKeyPair(pubKey, privKey)); 
 }
 
 #[swift_bridge::bridge]
 mod ffi {
+    // Rust-Methods can be used in Swift 
     extern "Rust" {
-        fn hello_rust() -> String;
     }
 
+    // Swift-Methods can be used in Rust 
     extern "Swift" {
-        fn hello_swift() -> String;
+        fn rustcall_generateKeyPair(publicKeyName: String, privateKeyName: String) -> String;
     }
-}
-
-fn hello_rust() -> String {
-    println!("hello from rust");
-
-  return "hi".to_owned();
 }
