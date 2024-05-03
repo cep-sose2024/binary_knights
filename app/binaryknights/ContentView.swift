@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  binaryknights
 //
-//  Created by Kiwan Taylan Cakir on 27.04.24.
+//  Created by Kiwan Taylan Cakir on 04.05.24.
 //
 
 import SwiftUI
@@ -50,8 +50,11 @@ struct ContentView: View {
             HStack{
                 Button("Encrypt") {
                     do{
+                        print(SEkeyPair!.privateKey.hashValue as Any)
                         print("private Key: "+String((SEkeyPair?.privateKey.hashValue)!))
                         encryptedText = try enclaveManager.encrypt(data: input.data(using: .utf8)!, publicKey: SEkeyPair!.publicKey).base64EncodedString()
+//                        }
+                        
                     } catch {
                         print("Unbehandelter Error!")
                     }
@@ -62,9 +65,10 @@ struct ContentView: View {
                 Button("Decrypt") {
                     do{
                         print("private Key: "+String((SEkeyPair?.privateKey.hashValue)!))
-                        //                        decryptedText =
-                        print(try enclaveManager.decrypt(input.data(using: .utf8)!, privateKey: SEkeyPair!.privateKey))
+                        let data = Data(base64Encoded: input)
+                        let bla = try enclaveManager.decrypt(data!, privateKey: SEkeyPair!.privateKey)
                         
+                        decryptedText = String(data: bla, encoding: .utf8)!
                         
                     } catch {
                         print("Unbehandelter Fehler: \(error)")
