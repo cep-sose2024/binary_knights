@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6066ADEA2BE507A3009FBCBD /* SecureEnclaveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6066ADE92BE507A3009FBCBD /* SecureEnclaveManager.swift */; };
 		608D9BCF2BDD30F600BCE085 /* binaryknightsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608D9BCE2BDD30F600BCE085 /* binaryknightsApp.swift */; };
 		608D9BD12BDD30F600BCE085 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608D9BD02BDD30F600BCE085 /* ContentView.swift */; };
 		608D9BD32BDD30F700BCE085 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 608D9BD22BDD30F700BCE085 /* Assets.xcassets */; };
@@ -34,6 +35,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6066ADE92BE507A3009FBCBD /* SecureEnclaveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureEnclaveManager.swift; sourceTree = "<group>"; };
 		608D9BCB2BDD30F500BCE085 /* binaryknights.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = binaryknights.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		608D9BCE2BDD30F600BCE085 /* binaryknightsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = binaryknightsApp.swift; sourceTree = "<group>"; };
 		608D9BD02BDD30F600BCE085 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -95,6 +97,7 @@
 		608D9BCD2BDD30F500BCE085 /* binaryknights */ = {
 			isa = PBXGroup;
 			children = (
+				6066ADE92BE507A3009FBCBD /* SecureEnclaveManager.swift */,
 				608D9BCE2BDD30F600BCE085 /* binaryknightsApp.swift */,
 				608D9BD02BDD30F600BCE085 /* ContentView.swift */,
 				608D9BD22BDD30F700BCE085 /* Assets.xcassets */,
@@ -260,6 +263,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				608D9BD12BDD30F600BCE085 /* ContentView.swift in Sources */,
+				6066ADEA2BE507A3009FBCBD /* SecureEnclaveManager.swift in Sources */,
 				608D9BCF2BDD30F600BCE085 /* binaryknightsApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
