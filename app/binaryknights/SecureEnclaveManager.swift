@@ -3,11 +3,8 @@ import LocalAuthentication
 import Security
 
 class SecureEnclaveManager{
-    let algorithm: SecKeyAlgorithm = .eciesEncryptionCofactorVariableIVX963SHA256AESGCM
-    
-    func sayHello() -> String{
-        return "Hello!"
-    }
+    let algorithm: SecKeyAlgorithm = SecKeyAlgorithm.eciesEncryptionCofactorVariableIVX963SHA256AESGCM
+    let sign_algorithm: SecKeyAlgorithm = SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256
     
     func generateKeyPair(_ publicKeyName: String,_ privateKeyName: String ) throws -> SEKeyPair {
         let accessControl = createAccessControlObject()
@@ -37,19 +34,6 @@ class SecureEnclaveManager{
         
         return keyPair
     }
-    
-    ///** Optimized method off @generateKeyPair() to communicate with the rust-side abstraction-layer.
-    // Output and input is only in string-forms possible **/
-    //func rustcall_generateKeyPair(publicKeyName: RustString,privateKeyName: RustString) -> String {
-    //    // Add-Error-Case: If an Secure Enclave Processor does not exist.
-    //    do{
-    //        let keys = try generateKeyPair(publicKeyName.toString(), privateKeyName.toString()).publicKey as! Data
-    //        let keysString = keys.base64EncodedString()
-    //        return keysString
-    //    }catch{
-    //        return ("\(error)")
-    //    }
-    //}
     
     func createAccessControlObject() -> SecAccessControl {
         let access = SecAccessControlCreateWithFlags(
@@ -86,6 +70,38 @@ class SecureEnclaveManager{
         return SecKeyCopyPublicKey(privateKey);
     }
     
+    func signing_data(_ privateKey: SecKey, _ content: String) throws -> CFData? {
+        guard let content_data = content.data(using: String.Encoding.utf8)
+        else{
+            throw SecureEnclaveError.runtimeError("Invalid message to sign")
+        }
+        
+        if !SecKeyIsAlgorithmSupported(privateKey, SecKeyOperationType.sign, sign_algorithm){
+            throw SecureEnclaveError.runtimeError("Algorithm is not supported")
+        }
+        
+        var error: Unmanaged<CFError>?
+        guard let signed_data = SecKeyCreateSignature(privateKey, SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256, content_data as CFData, &error)
+        else{
+            throw SecureEnclaveError.runtimeError("Data couldn´t be signed")
+        }
+        return signed_data
+    }
+    
+    func verify_data(_ publicKey: SecKey,_ content: String,_ signature: CFData) throws -> Bool{
+        guard let content_data = content.data(using: String.Encoding.utf8)
+        else{
+            throw SecureEnclaveError.runtimeError("Invalid message to verify")
+        }
+        
+        var error: Unmanaged<CFError>?
+        if SecKeyVerifySignature(publicKey, sign_algorithm, content_data as CFData, signature, &error){
+            return true
+        } else{
+          return false
+        }
+    }
+
     enum SecureEnclaveError: Error {
         case runtimeError(String)
     }
