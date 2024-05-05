@@ -6,7 +6,7 @@ class SecureEnclaveManager{
     let algorithm: SecKeyAlgorithm = SecKeyAlgorithm.eciesEncryptionCofactorVariableIVX963SHA256AESGCM
     let sign_algorithm: SecKeyAlgorithm = SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256
     
-    func generateKeyPair(_ privateKeyName: String ) throws -> SEKeyPair {
+    func create_key(_ privateKeyName: String ) throws -> SEKeyPair {
         let accessControl = createAccessControlObject()
         
         let privateKeyParams: [String: Any] = [
@@ -49,7 +49,7 @@ class SecureEnclaveManager{
         return access
     }
     
-    func encrypt(data: Data, publicKey: SecKey) throws -> Data {
+    func encrypt_data(data: Data, publicKey: SecKey) throws -> Data {
         var error: Unmanaged<CFError>?
         let result = SecKeyCreateEncryptedData(publicKey, algorithm, data as CFData, &error)
         
@@ -60,7 +60,7 @@ class SecureEnclaveManager{
         return result! as Data
     }
     
-    func decrypt(_ data: Data, privateKey: SecKey) throws -> Data {
+    func decrypt_data(_ data: Data, privateKey: SecKey) throws -> Data {
         var error: Unmanaged<CFError>?
         let result = SecKeyCreateDecryptedData(privateKey, algorithm, data as CFData, &error)
         
@@ -89,7 +89,7 @@ class SecureEnclaveManager{
         return signed_data
     }
     
-    func verify_data(_ publicKey: SecKey,_ content: String,_ signature: CFData) throws -> Bool{
+    func verify_signature(_ publicKey: SecKey,_ content: String,_ signature: CFData) throws -> Bool{
         guard let content_data = content.data(using: String.Encoding.utf8)
         else{
             throw SecureEnclaveError.runtimeError("Invalid message to verify")
@@ -112,8 +112,8 @@ class SecureEnclaveManager{
         let privateKey: SecKey
     }
     
-    static func loadKey(name: String) throws -> SecKey? {
-        let tag = name.data(using: .utf8)!
+    static func load_key(_ key_id: String) throws -> SecKey? {
+        let tag = key_id.data(using: .utf8)!
         let query: [String: Any] = [
             kSecClass as String                 : kSecClassKey,
             kSecAttrApplicationTag as String    : tag,
@@ -143,6 +143,10 @@ class SecureEnclaveManager{
         else {
             throw SecureEnclaveError.runtimeError("Failed to store Key in the Keychain")
         }
+    }
+    // TODO:
+    func initialize_module(){
+        
     }
     
 //    static func getKey(_ name: String) throws -> SecKey?{

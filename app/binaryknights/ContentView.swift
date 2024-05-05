@@ -18,7 +18,7 @@ struct ContentView: View {
     
     init() {
         do {
-          SEkeyPair = try enclaveManager.generateKeyPair("priVAteK$y")
+          SEkeyPair = try enclaveManager.create_key("priVAteK$y")
             print("Successful generated KeyPair")
         } catch {
             print("\(error)")
@@ -53,7 +53,7 @@ struct ContentView: View {
                         do{
                             print(SEkeyPair!.privateKey.hashValue as Any)
                             print("private Key: "+String((SEkeyPair?.privateKey.hashValue)!))
-                            encryptedText = try enclaveManager.encrypt(data: input.data(using: .utf8)!, publicKey: SEkeyPair!.publicKey).base64EncodedString()
+                            encryptedText = try enclaveManager.encrypt_data(data: input.data(using: .utf8)!, publicKey: SEkeyPair!.publicKey).base64EncodedString()
                             
                         } catch {
                             print("Unbehandelter Error!")
@@ -65,8 +65,8 @@ struct ContentView: View {
                         do{
                             print("private Key: "+String((SEkeyPair?.privateKey.hashValue)!))
                             let data = Data(base64Encoded: input)
-                            let bla = try enclaveManager.decrypt(data!, privateKey: SEkeyPair!.privateKey)
-                            
+                            let bla = try enclaveManager.decrypt_data(data!, privateKey: SEkeyPair!.privateKey)
+
                             decryptedText = String(data: bla, encoding: .utf8)!
                             
                         } catch {
@@ -81,6 +81,7 @@ struct ContentView: View {
                     Button("Signing Data"){
                         do{
                             signature = try enclaveManager.signing_data(SEkeyPair!.privateKey, input.data(using: String.Encoding.utf8)! as CFData)!
+                            print("signature = "+String(signature.hashValue))
                         }catch{
                             input = ("\(error)")
                         }
@@ -88,7 +89,7 @@ struct ContentView: View {
                     
                     Button("Verify") {
                         do{
-                            if try enclaveManager.verify_data(SEkeyPair!.publicKey, input, signature){
+                            if try enclaveManager.verify_signature(SEkeyPair!.publicKey, input, signature){
                                 input = "true"
                             }
                         }catch{
@@ -98,8 +99,8 @@ struct ContentView: View {
                     
                     Button("getKey") {
                         do{
-                            let loadedKey = try SecureEnclaveManager.loadKey(name: input)
-                            print("Key Referenze wurde geladen")
+                            let loadedKey = try SecureEnclaveManager.load_key(input)
+                            print("Key Referenze wurde geladen: "+String(loadedKey.hashValue))
                         }catch{
                             print("\(error)")
                         }
