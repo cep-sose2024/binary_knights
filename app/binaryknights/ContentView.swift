@@ -47,70 +47,72 @@ struct ContentView: View {
             TextField("Key of Secure Enclave 🔓:", text: $encryptedText)
                 .font(.system(size: 12))
             
-            
-            HStack{
-                Button("Encrypt") {
-                    do{
-                        print(SEkeyPair!.privateKey.hashValue as Any)
-                        print("private Key: "+String((SEkeyPair?.privateKey.hashValue)!))
-                        encryptedText = try enclaveManager.encrypt(data: input.data(using: .utf8)!, publicKey: SEkeyPair!.publicKey).base64EncodedString()
-                        
-                    } catch {
-                        print("Unbehandelter Error!")
-                    }
-                    //Logik-Methodenaufruf aus Klasse SecureEnclavemanager
-                }.padding(.vertical, 8).padding(.horizontal).cornerRadius(8)
-                
-                Button("Decrypt") {
-                    do{
-                        print("private Key: "+String((SEkeyPair?.privateKey.hashValue)!))
-                        let data = Data(base64Encoded: input)
-                        let bla = try enclaveManager.decrypt(data!, privateKey: SEkeyPair!.privateKey)
-                        
-                        decryptedText = String(data: bla, encoding: .utf8)!
-                        
-                    } catch {
-                        print("Unbehandelter Fehler: \(error)")
-                    }
-                }.padding(.vertical, 8).padding(.horizontal).cornerRadius(8)
-                
-                Button("Switch") {
-                    input = encryptedText
-                }
-                
-                Button("Signing Data"){
-                    do{
-                        signature = try enclaveManager.signing_data(SEkeyPair!.privateKey, input)!
-                    }catch{
-                        input = ("\(error)")
-                    }
-                }
-                
-                Button("Verify") {
-                    do{
-                        if try enclaveManager.verify_data(SEkeyPair!.publicKey, input, signature){
-                            input = "true"
+            VStack {
+                HStack{
+                    Button("Encrypt") {
+                        do{
+                            print(SEkeyPair!.privateKey.hashValue as Any)
+                            print("private Key: "+String((SEkeyPair?.privateKey.hashValue)!))
+                            encryptedText = try enclaveManager.encrypt(data: input.data(using: .utf8)!, publicKey: SEkeyPair!.publicKey).base64EncodedString()
+                            
+                        } catch {
+                            print("Unbehandelter Error!")
                         }
-                    }catch{
-                        input = "false"
-                    }
+                        //Logik-Methodenaufruf aus Klasse SecureEnclavemanager
+                    }.padding(.vertical, 8).padding(.horizontal).cornerRadius(8)
+                    
+                    Button("Decrypt") {
+                        do{
+                            print("private Key: "+String((SEkeyPair?.privateKey.hashValue)!))
+                            let data = Data(base64Encoded: input)
+                            let bla = try enclaveManager.decrypt(data!, privateKey: SEkeyPair!.privateKey)
+                            
+                            decryptedText = String(data: bla, encoding: .utf8)!
+                            
+                        } catch {
+                            print("Unbehandelter Fehler: \(error)")
+                        }
+                    }.padding(.vertical, 8).padding(.horizontal).cornerRadius(8)
+                    
+                    Button("Switch") {
+                        input = encryptedText
+                    }}
+                HStack{
+                    Button("Signing Data"){
+                        do{
+                            signature = try enclaveManager.signing_data(SEkeyPair!.privateKey, input)!
+                        }catch{
+                            input = ("\(error)")
+                        }
+                    }.padding(.vertical, 8).padding(.horizontal).cornerRadius(8)
+                    
+                    Button("Verify") {
+                        do{
+                            if try enclaveManager.verify_data(SEkeyPair!.publicKey, input, signature){
+                                input = "true"
+                            }
+                        }catch{
+                            input = "false"
+                        }
+                    }.padding(.vertical, 8).padding(.horizontal).cornerRadius(8)
+                    
+                    Button("getKey") {
+                        do{
+                            let loadedKey = try SecureEnclaveManager.loadKey(name: input)
+                            print("Key Referenze wurde geladen")
+                        }catch{
+                            print("\(error)")
+                        }
+                    }.padding(.vertical, 8).padding(.horizontal).cornerRadius(8)
                 }
-                
-                Button("getKey") {
-                    do{
-                        let loadedKey = try SecureEnclaveManager.loadKey(name: input)
-                        print("Key Referenze wurde geladen")
-                    }catch{
-                        print("\(error)")
-                    }
-                }
-                
-                Button("StoreKey") {
-                    do{
-                        try enclaveManager.storeKey_Keychain(input, SEkeyPair!.privateKey)
-                        print("Key wurde gestored")
-                    }catch{
-                        print("\(error)")
+                HStack{
+                    Button("StoreKey") {
+                        do{
+                            try enclaveManager.storeKey_Keychain(input, SEkeyPair!.privateKey)
+                            print("Key wurde gestored")
+                        }catch{
+                            print("\(error)")
+                        }
                     }
                 }
             }
