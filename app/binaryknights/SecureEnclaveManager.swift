@@ -6,7 +6,7 @@ class SecureEnclaveManager{
     let algorithm: SecKeyAlgorithm = SecKeyAlgorithm.eciesEncryptionCofactorVariableIVX963SHA256AESGCM
     let sign_algorithm: SecKeyAlgorithm = SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256
     
-    func generateKeyPair(_ publicKeyName: String,_ privateKeyName: String ) throws -> SEKeyPair {
+    func generateKeyPair(_ privateKeyName: String ) throws -> SEKeyPair {
         let accessControl = createAccessControlObject()
         
         let privateKeyParams: [String: Any] = [
@@ -32,6 +32,11 @@ class SecureEnclaveManager{
         
         let keyPair = SEKeyPair(publicKey: publicKey, privateKey: privateKeyReference)
         
+//        do{
+//            try storeKey_Keychain(privateKeyName, keyPair.privateKey)
+//        }catch{
+//            throw SecureEnclaveError.runtimeError("Failed to store Key in the Keychain") //TODO muss noch überarbeitet werden. Existiert bereits in der Methode
+//        }
         return keyPair
     }
     
@@ -67,7 +72,7 @@ class SecureEnclaveManager{
     }
     
     func getPublicKeyFromPrivateKey(privateKey: SecKey) -> SecKey? {
-        return SecKeyCopyPublicKey(privateKey);
+        return SecKeyCopyPublicKey(privateKey)
     }
     
     func signing_data(_ privateKey: SecKey, _ content: String) throws -> CFData? {
@@ -110,4 +115,58 @@ class SecureEnclaveManager{
         let publicKey: SecKey
         let privateKey: SecKey
     }
+    
+    static func loadKey(name: String) throws -> SecKey? {
+        let tag = name.data(using: .utf8)!
+        let query: [String: Any] = [
+            kSecClass as String                 : kSecClassKey,
+            kSecAttrApplicationTag as String    : tag,
+            kSecAttrKeyType as String           : kSecAttrKeyTypeEC,
+            kSecReturnRef as String             : true
+        ]
+        
+        var item: CFTypeRef?
+        let status = SecItemCopyMatching(query as CFDictionary, &item)
+        guard status == errSecSuccess else {
+            throw SecureEnclaveError.runtimeError("Couldn´t find the key")
+        }
+        return (item as! SecKey)
+    }
+    
+    
+    func storeKey_Keychain(_ name: String, _ privateKey: SecKey) throws{
+        let key = privateKey
+        let tag = name.data(using: .utf8)!
+        let addquery: [String: Any] = [kSecClass as String: kSecClassKey,
+                                       kSecAttrApplicationTag as String: tag,
+                                       kSecValueRef as String: key]
+        
+//        var error: Unmanaged<CFError>?
+        let status = SecItemAdd(addquery as CFDictionary, nil)
+        guard status == errSecSuccess
+        else {
+            throw SecureEnclaveError.runtimeError("Failed to store Key in the Keychain")
+        }
+    }
+    
+//    static func getKey(_ name: String) throws -> SecKey?{
+//        let tag = name.data(using: .utf8)
+//        
+//        let getquery: [String: Any] = [kSecClass as String: kSecClassKey,
+//                                       kSecAttrApplicationTag as String: tag!,
+//                                       kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
+//                                       kSecReturnRef as String: true]
+//        
+//        var item: CFTypeRef?
+//        let status = SecItemCopyMatching(getquery as CFDictionary, &item)
+//        guard status == errSecSuccess 
+//        else {
+//            throw SecureEnclaveError.runtimeError("Couldn´t find Key with the Tag. Status: \(status)")
+//        }
+//        let key = item as! SecKey
+//        
+//        return key
+//    }
 }
+
+

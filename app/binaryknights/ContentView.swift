@@ -12,15 +12,16 @@ struct ContentView: View {
     @State private var input: String = "Hello World!"
     @State private var decryptedText: String = "-"
     @State var encryptedText: String = "None"
+    @State var signature: CFData = "".data(using: .utf8)! as CFData
     let enclaveManager = SecureEnclaveManager()
     var SEkeyPair: SecureEnclaveManager.SEKeyPair?
     
     init() {
         do {
-            SEkeyPair = try enclaveManager.generateKeyPair("public", "priVAteK$y")
-            print("Done")
+          SEkeyPair = try enclaveManager.generateKeyPair("priVAteK$y")
+            print("Successful generated KeyPair")
         } catch {
-            print("Blabla")
+            print("\(error)")
         }
     }
     
@@ -53,13 +54,11 @@ struct ContentView: View {
                         print(SEkeyPair!.privateKey.hashValue as Any)
                         print("private Key: "+String((SEkeyPair?.privateKey.hashValue)!))
                         encryptedText = try enclaveManager.encrypt(data: input.data(using: .utf8)!, publicKey: SEkeyPair!.publicKey).base64EncodedString()
-//                        }
                         
                     } catch {
                         print("Unbehandelter Error!")
                     }
-                    //encryptedText=enclaveManager.sayHello()
-                    //                    Logik-Methodenaufruf aus Klasse SecureEnclavemanager
+                    //Logik-Methodenaufruf aus Klasse SecureEnclavemanager
                 }.padding(.vertical, 8).padding(.horizontal).cornerRadius(8)
                 
                 Button("Decrypt") {
@@ -77,6 +76,42 @@ struct ContentView: View {
                 
                 Button("Switch") {
                     input = encryptedText
+                }
+                
+                Button("Signing Data"){
+                    do{
+                        signature = try enclaveManager.signing_data(SEkeyPair!.privateKey, input)!
+                    }catch{
+                        input = ("\(error)")
+                    }
+                }
+                
+                Button("Verify") {
+                    do{
+                        if try enclaveManager.verify_data(SEkeyPair!.publicKey, input, signature){
+                            input = "true"
+                        }
+                    }catch{
+                        input = "false"
+                    }
+                }
+                
+                Button("getKey") {
+                    do{
+                        let loadedKey = try SecureEnclaveManager.loadKey(name: input)
+                        print("Key Referenze wurde geladen")
+                    }catch{
+                        print("\(error)")
+                    }
+                }
+                
+                Button("StoreKey") {
+                    do{
+                        try enclaveManager.storeKey_Keychain(input, SEkeyPair!.privateKey)
+                        print("Key wurde gestored")
+                    }catch{
+                        print("\(error)")
+                    }
                 }
             }
         }
