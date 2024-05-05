@@ -80,7 +80,7 @@ struct ContentView: View {
                 HStack{
                     Button("Signing Data"){
                         do{
-                            signature = try enclaveManager.signing_data(SEkeyPair!.privateKey, input)!
+                            signature = try enclaveManager.signing_data(SEkeyPair!.privateKey, input.data(using: String.Encoding.utf8)! as CFData)!
                         }catch{
                             input = ("\(error)")
                         }

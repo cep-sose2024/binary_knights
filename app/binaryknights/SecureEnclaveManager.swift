@@ -75,18 +75,14 @@ class SecureEnclaveManager{
         return SecKeyCopyPublicKey(privateKey)
     }
     
-    func signing_data(_ privateKey: SecKey, _ content: String) throws -> CFData? {
-        guard let content_data = content.data(using: String.Encoding.utf8)
-        else{
-            throw SecureEnclaveError.runtimeError("Invalid message to sign")
-        }
-        
+    func signing_data(_ privateKey: SecKey, _ content: CFData) throws -> CFData? {
+                
         if !SecKeyIsAlgorithmSupported(privateKey, SecKeyOperationType.sign, sign_algorithm){
             throw SecureEnclaveError.runtimeError("Algorithm is not supported")
         }
         
         var error: Unmanaged<CFError>?
-        guard let signed_data = SecKeyCreateSignature(privateKey, SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256, content_data as CFData, &error)
+        guard let signed_data = SecKeyCreateSignature(privateKey, SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256, content as CFData, &error)
         else{
             throw SecureEnclaveError.runtimeError("Data couldn´t be signed")
         }
