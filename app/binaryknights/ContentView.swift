@@ -115,6 +115,14 @@ struct ContentView: View {
                             print("\(error)")
                         }
                     }
+                    Button("SE aviable?") {
+//                        let isAvailable2 = try enclaveManager.initializeModule()
+                        do{
+                            try print("the Secure Enclave is  ("+String(enclaveManager.initializeModule())+")")
+                        }catch{
+                            print("\(error)")
+                        }
+                    }
                 }
             }
         }

@@ -1,6 +1,7 @@
 import Foundation
 import LocalAuthentication
 import Security
+import CryptoKit
 
 class SecureEnclaveManager{
     let algorithm: SecKeyAlgorithm = SecKeyAlgorithm.eciesEncryptionCofactorVariableIVX963SHA256AESGCM
@@ -139,10 +140,41 @@ class SecureEnclaveManager{
             throw SecureEnclaveError.runtimeError("Failed to store Key in the Keychain")
         }
     }
+    
+    static var isAvailable: Bool {
+                  return true
+    }
+    var privateKey: P256.KeyAgreement.PrivateKey?
+    var publicKey: P256.KeyAgreement.PublicKey?
+    var initialized: Bool = false
+
+    func initializeModule() throws-> Bool  {
+        self.privateKey =  P256.KeyAgreement.PrivateKey()
+        self.publicKey = privateKey!.publicKey
+        self.initialized = true
+        guard self.initialized else{
+            throw SecureEnclaveError.runtimeError("Did not initailze any Module")
+
+        }
+        guard SecureEnclave.isAvailable else {
+            throw SecureEnclaveError.runtimeError("Secure Enclave is not Available on this Device")
+        }
+        return true
+    }
+
+    
+    
+    
+    
+    
+    
+    
+    
     // TODO:
     func initialize_module(){
         
     }
+    
 }
 
 
