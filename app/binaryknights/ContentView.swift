@@ -21,7 +21,7 @@ struct ContentView: View {
           SEkeyPair = try enclaveManager.create_key("priVAteK$y")
             print("Successful generated KeyPair")
         } catch {
-            print("\(error)")
+            print("KeyPair konnte nicht generiert werden: \(error)")
         }
     }
     
