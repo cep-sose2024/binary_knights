@@ -15,6 +15,9 @@ struct ContentView: View {
     @State var signature: CFData = "".data(using: .utf8)! as CFData
     let enclaveManager = SecureEnclaveManager()
     var SEkeyPair: SecureEnclaveManager.SEKeyPair?
+    enum CustomError: Error {
+        case runtimeError(String)
+    }
     
     init() {
         do {
@@ -63,12 +66,21 @@ struct ContentView: View {
                     
                     Button("Decrypt") {
                         do{
-                            print("private Key: "+String((SEkeyPair?.privateKey.hashValue)!))
-                            let data = Data(base64Encoded: input)
-                            let bla = try enclaveManager.decrypt_data(data!, privateKey: SEkeyPair!.privateKey)
-
-                            decryptedText = String(data: bla, encoding: .utf8)!
+//                            print("private Key: "+String((SEkeyPair?.privateKey.hashValue)!))
                             
+                            guard let data = Data(base64Encoded: input) else {
+                                        throw CustomError.runtimeError("Invalid base64 input")
+                                    }
+                            
+                            let decryptedData = try enclaveManager.decrypt_data(data, privateKey: SEkeyPair!.privateKey)
+
+
+                            guard let deText = String(data: decryptedData, encoding: .utf8) else {
+                                throw CustomError.runtimeError("Error converting decrypted data to string")
+                            }
+
+                            decryptedText = deText
+
                         } catch {
                             print("Unbehandelter Fehler: \(error)")
                         }
