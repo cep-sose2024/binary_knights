@@ -32,11 +32,6 @@ class SecureEnclaveManager{
         
         let keyPair = SEKeyPair(publicKey: publicKey, privateKey: privateKeyReference)
         
-//        do{
-//            try storeKey_Keychain(privateKeyName, keyPair.privateKey)
-//        }catch{
-//            throw SecureEnclaveError.runtimeError("Failed to store Key in the Keychain") //TODO muss noch überarbeitet werden. Existiert bereits in der Methode
-//        }
         return keyPair
     }
     
@@ -148,25 +143,6 @@ class SecureEnclaveManager{
     func initialize_module(){
         
     }
-    
-//    static func getKey(_ name: String) throws -> SecKey?{
-//        let tag = name.data(using: .utf8)
-//        
-//        let getquery: [String: Any] = [kSecClass as String: kSecClassKey,
-//                                       kSecAttrApplicationTag as String: tag!,
-//                                       kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
-//                                       kSecReturnRef as String: true]
-//        
-//        var item: CFTypeRef?
-//        let status = SecItemCopyMatching(getquery as CFDictionary, &item)
-//        guard status == errSecSuccess 
-//        else {
-//            throw SecureEnclaveError.runtimeError("Couldn´t find Key with the Tag. Status: \(status)")
-//        }
-//        let key = item as! SecKey
-//        
-//        return key
-//    }
 }
 
 
