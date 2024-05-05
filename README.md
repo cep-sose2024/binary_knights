@@ -18,15 +18,15 @@ This is a project in cooperation with j&s-soft GmbH and the Mannheim University 
 
 The following programs are required for the editing environment:
 
-[![Visual Studio Code]()](https://code.visualstudio.com/download)
+<a href="https://code.visualstudio.com/download"><img src="https://code.visualstudio.com/favicon.ico" alt="Visual Studio Code" width="20" height="20"> Visual Studio Code</a>
 
-[![Xcode]()](https://xcodereleases.com/)
+<a href="https://xcodereleases.com/"><img src="https://xcodereleases.com/favicon-32x32.png" alt="Xcode" width="20" height="20"> Xcode</a>
 
-[![Flutter]()](https://docs.flutter.dev/get-started/install)
+<a href="https://docs.flutter.dev/get-started/install"><img src="https://seekicon.com/free-icon-download/flutter_2.svg" alt="Flutter" width="20" height="20"> Flutter</a>
 
-[![CocoaPods]()](https://cocoapods.org/)
+<a href="https://cocoapods.org/"><img src="https://www.svgrepo.com/show/353570/cocoapods.svg" alt="CocoaPods" width="20" height="20"> CocoaPods</a>
 
-[![Rust]()](https://www.rust-lang.org/tools/install)
+<a href="https://www.rust-lang.org/tools/install"><img src="https://logodix.com/logo/700854.png" alt="Rust" width="20" height="20"> Rust</a>
 
 #### Important information about the installation of Flutter: 
 The entire "Install the Flutter SDK" tab should be followed!
@@ -73,6 +73,10 @@ The same also applies to MacBooks. In addition, the MacBook Pro 2016 and 2017, w
 <p align=center> <a href="https://support.apple.com/guide/security/secure-enclave-sec59b0b31ff/web" target="_blank"><img src="https://help.apple.com/assets/627EBB4D4FDDD519030FB00A/627EBB504FDDD519030FB012/en_US/9302f62027e1966222080ef2731e45de.png" style="width:60%;"></a> </p>
 
 
+### References
+
+This project is based on [ios-secure-enclave-sample](https://github.com/agestaun/ios-secure-enclave-sample) by [agestaun](https://github.com/agestaun), which is licensed under the MIT License.
+We made several modifications to adapt the code for our project.
 
 
 
