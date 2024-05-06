@@ -16,18 +16,28 @@ struct ContentView: View {
     private var keyPair: SecureEnclaveManager.SEKeyPair?
     
     init() {
+        do{
+            if try key_handle.initializeModule(){
+                print("Modul is initialised. Secure Enclave is available.\n")
+            }
+        }catch{
+            print("\(error)")
+        }
+        
         do {
             keyPair = try key_handle.create_key("priVAteK$y")
-            print("Successful generated KeyPair")
+            print("Successful generated KeyPair. \n")
+            print("Private Key: "+String((keyPair?.privateKey.hashValue)!))
+            print("Public Key: " + String((keyPair?.publicKey.hashValue)!))
+            print("\n")
         } catch {
             print("KeyPair konnte nicht generiert werden: \(error)")
         }
+       
     }
     
     var body: some View {
         ScrollView{
-            
-        
         VStack(alignment: .leading){
             Text("Encryption & Decryption")
                 .font(.title)
@@ -52,9 +62,8 @@ struct ContentView: View {
                     
                     Button("Encrypt"){
                         do{
-                            print(keyPair!.privateKey.hashValue as Any)
-                            print("private Key: "+String((keyPair?.privateKey.hashValue)!))
                             encrypted_value = try key_handle.encrypt_data(data: encryption_input.data(using: .utf8)!, publicKey: keyPair!.publicKey).base64EncodedString()
+                            print("Successful encrypted: \(encryption_input) in \(encrypted_value) \n")
                         } catch {
                             print("\(error)")
                         }
@@ -83,9 +92,10 @@ struct ContentView: View {
                             else {
                                 throw CustomError.runtimeError("Error converting decrypted data to string")
                             }
-                            
+
                             decrypted_value = temp_decrypted_value
                             
+                            print("Successful decrypted: \(encrypted_value) in \(decrypted_value) \n")
                             } catch {
                                 print("Fehler: \(error)")
                             }
@@ -127,7 +137,7 @@ struct ContentView: View {
                         do{
                             temp_signature_value = try key_handle.sign_data(keyPair!.privateKey, sign_input.data(using: String.Encoding.utf8)! as CFData)!
                             signature_value = String(temp_signature_value.hashValue)
-                            print("Signature = " + String(signature_value))
+                            print("Successfull signed \(sign_input) in \(String(signature_value)) \n")
                         }catch{
                             print("\(error)")
                         }
@@ -150,10 +160,10 @@ struct ContentView: View {
                         do{
                             if try key_handle.verify_signature(keyPair!.publicKey, sign_input, temp_signature_value) && signature_value == String(temp_signature_value.hashValue){
                                 verify_status = "valid"
-                                print("Signature is valid \(signature_value)" )
+                                print("Verify: '\(sign_input)' and '\(signature_value)' is valid" )
                             }else{
                                 verify_status = "invalid"
-                                print("Signature is invalid")
+                                print("Verify: '\(sign_input)' and '\(signature_value)' is invalid" )
                             }
                         }catch{
                             print("\(error)")
