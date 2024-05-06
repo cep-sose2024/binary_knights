@@ -159,7 +159,7 @@ struct ContentView: View {
                         .cornerRadius(10)
                     Button("Verify "){
                         do{
-                            if try key_handle.verify_signature(keyPair!.publicKey, sign_input, temp_signature_value){
+                            if try key_handle.verify_signature(keyPair!.publicKey, sign_input, temp_signature_value) && signature_value == String(temp_signature_value.hashValue){
                                 verify_status = "valid"
                                 print("Signature is valid \(signature_value)" )
                             }else{
@@ -192,7 +192,7 @@ struct ContentView: View {
                 sign_input = ""
                 signature_value = ""
                 verify_status = ""
-                
+                print("Everything cleared!")
             }
             .padding(/*@START_MENU_TOKEN@*/.all, 5.0/*@END_MENU_TOKEN@*/)
             .background(Color.red)
