@@ -9,12 +9,11 @@ struct ContentView: View {
     @State private var signature_value: String = ""
     @State private var temp_signature_value: CFData = "".data(using: .utf8)! as CFData
     @State private var obj_signature_value: CFData = "".data(using: .utf8)! as CFData
-
     @State private var verify_status: String = ""
     
     /**SwiftUI Backend Variables**/
-    let key_handle = SecureEnclaveManager()
-    var keyPair: SecureEnclaveManager.SEKeyPair?
+    private var key_handle = SecureEnclaveManager()
+    private var keyPair: SecureEnclaveManager.SEKeyPair?
     
     init() {
         do {
@@ -23,8 +22,8 @@ struct ContentView: View {
         } catch {
             print("KeyPair konnte nicht generiert werden: \(error)")
         }
-        }
-
+    }
+    
     var body: some View {
         ScrollView{
             
@@ -36,14 +35,9 @@ struct ContentView: View {
                 .padding(4.0)
             HStack{
                 VStack(alignment: .leading){
-                    Text("Private Key: \(1232465468)")
-                    Text("Public Key: \(135454346)")
+                    Text("Private Key: "+String((keyPair!.privateKey.hashValue)))
+                    Text("Public Key: "+String((keyPair!.publicKey.hashValue)))
                 }
-                
-                Button("Generate \nKeys🔑"){
-                    /**Generate Key implementation**/
-                }
-                    
             }
             
             VStack(alignment: .leading){
@@ -80,17 +74,12 @@ struct ContentView: View {
                         .cornerRadius(10)
                     Button("Decrypt"){
                         do{
-                            //print("private Key: "+String((SEkeyPair?.privateKey.hashValue)!))
-                                                    
                             guard let data = Data(base64Encoded: encrypted_value)
                             else {
                                 throw CustomError.runtimeError("Invalid base64 input")
                             }
                                                     
-                            var deText = try key_handle.decrypt_data(data, privateKey: keyPair!.privateKey)
-
-
-                            guard let temp_decrypted_value = String(data: deText, encoding: .utf8)
+                            guard let temp_decrypted_value = String(data: try key_handle.decrypt_data(data, privateKey: keyPair!.privateKey), encoding: .utf8)
                             else {
                                 throw CustomError.runtimeError("Error converting decrypted data to string")
                             }
@@ -98,7 +87,7 @@ struct ContentView: View {
                             decrypted_value = temp_decrypted_value
                             
                             } catch {
-                                print("Unbehandelter Fehler: \(error)")
+                                print("Fehler: \(error)")
                             }
                     }
                     .padding(.trailing, 20.0)
