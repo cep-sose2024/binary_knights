@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		605F59DD2BE937180021C4C5 /* key_handle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 605F59DB2BE937180021C4C5 /* key_handle.swift */; };
-		605F59DE2BE937180021C4C5 /* provider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 605F59DC2BE937180021C4C5 /* provider.swift */; };
 		6066ADEA2BE507A3009FBCBD /* SecureEnclaveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6066ADE92BE507A3009FBCBD /* SecureEnclaveManager.swift */; };
 		608D9BCF2BDD30F600BCE085 /* binaryknightsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608D9BCE2BDD30F600BCE085 /* binaryknightsApp.swift */; };
 		608D9BD12BDD30F600BCE085 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608D9BD02BDD30F600BCE085 /* ContentView.swift */; };
@@ -38,8 +36,6 @@
 
 /* Begin PBXFileReference section */
 		10FB0E9E2BE695A9003B6C4B /* CodeAblage.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CodeAblage.md; sourceTree = "<group>"; };
-		605F59DB2BE937180021C4C5 /* key_handle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = key_handle.swift; sourceTree = "<group>"; };
-		605F59DC2BE937180021C4C5 /* provider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = provider.swift; sourceTree = "<group>"; };
 		6066ADE92BE507A3009FBCBD /* SecureEnclaveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureEnclaveManager.swift; sourceTree = "<group>"; };
 		608D9BCB2BDD30F500BCE085 /* binaryknights.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = binaryknights.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		608D9BCE2BDD30F600BCE085 /* binaryknightsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = binaryknightsApp.swift; sourceTree = "<group>"; };
@@ -106,8 +102,6 @@
 				6066ADE92BE507A3009FBCBD /* SecureEnclaveManager.swift */,
 				608D9BCE2BDD30F600BCE085 /* binaryknightsApp.swift */,
 				608D9BD02BDD30F600BCE085 /* ContentView.swift */,
-				605F59DC2BE937180021C4C5 /* provider.swift */,
-				605F59DB2BE937180021C4C5 /* key_handle.swift */,
 				608D9BD22BDD30F700BCE085 /* Assets.xcassets */,
 				608D9BD42BDD30F700BCE085 /* binaryknights.entitlements */,
 				608D9BD52BDD30F700BCE085 /* Preview Content */,
@@ -273,8 +267,6 @@
 				608D9BD12BDD30F600BCE085 /* ContentView.swift in Sources */,
 				6066ADEA2BE507A3009FBCBD /* SecureEnclaveManager.swift in Sources */,
 				608D9BCF2BDD30F600BCE085 /* binaryknightsApp.swift in Sources */,
-				605F59DE2BE937180021C4C5 /* provider.swift in Sources */,
-				605F59DD2BE937180021C4C5 /* key_handle.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

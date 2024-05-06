@@ -1,145 +1,216 @@
-//
-//  ContentView.swift
-//  binaryknights
-//
-//  Created by Kiwan Taylan Cakir on 04.05.24.
-//
-
 import SwiftUI
 
 struct ContentView: View {
+    /**SwiftUI Frontend Variables */
+    @State private var encryption_input: String = ""
+    @State private var encrypted_value: String = ""
+    @State private var decrypted_value: String = ""
+    @State private var sign_input: String = ""
+    @State private var signature_value: String = ""
+    @State private var temp_signature_value: CFData = "".data(using: .utf8)! as CFData
+    @State private var obj_signature_value: CFData = "".data(using: .utf8)! as CFData
+
+    @State private var verify_status: String = ""
     
-    @State private var input: String = "Hello World!"
-    @State private var decryptedText: String = "-"
-    @State var encryptedText: String = "None"
-    @State var signature: CFData = "".data(using: .utf8)! as CFData
-    let enclaveManager = SecureEnclaveManager()
-    var SEkeyPair: SecureEnclaveManager.SEKeyPair?
-    enum CustomError: Error {
-        case runtimeError(String)
-    }
+    /**SwiftUI Backend Variables**/
+    let key_handle = SecureEnclaveManager()
+    var keyPair: SecureEnclaveManager.SEKeyPair?
     
     init() {
         do {
-          SEkeyPair = try enclaveManager.create_key("priVAteK$y")
+            keyPair = try key_handle.create_key("priVAteK$y")
             print("Successful generated KeyPair")
         } catch {
             print("KeyPair konnte nicht generiert werden: \(error)")
         }
-    }
-    
-    
+        }
+
     var body: some View {
-        VStack(alignment: .center, spacing: 8) {
-            Text("Binary Knights")
-                .padding(.bottom, 30.0)
-            Text("Enter the text or Key 🔒")
-            TextField("Text to encrypt", text: $input)
-                .disableAutocorrection(true)
-                .frame(width: 250)
-                .padding(5)
+        ScrollView{
             
-            Text("Decrypted key 🔒")
-            TextField("Decrypted key 🔓:", text: $decryptedText)
-                .padding(.vertical, 16)
-            Text(decryptedText)
-                .font(.system(size: 12))
+        
+        VStack(alignment: .leading){
+            Text("Encryption & Decryption")
+                .font(.title)
+                .multilineTextAlignment(.leading)
+                .padding(4.0)
+            HStack{
+                VStack(alignment: .leading){
+                    Text("Private Key: \(1232465468)")
+                    Text("Public Key: \(135454346)")
+                }
+                
+                Button("Generate \nKeys🔑"){
+                    /**Generate Key implementation**/
+                }
+                    
+            }
             
-            
-            Text("Key of Secure Enclave 🔒")
-            TextField("Key of Secure Enclave 🔓:", text: $encryptedText)
-                .font(.system(size: 12))
-            
-            VStack {
+            VStack(alignment: .leading){
+                Text("Text to encrypt")
+                    .font(.title2)
+                
                 HStack{
-                    Button("Encrypt") {
+                    TextField("Text to encrypt", text: $encryption_input)
+                        .frame(height: 40.0)
+                        .background(Color.gray.opacity(0.5))
+                        .cornerRadius(10)
+                    
+                    Button("Encrypt"){
                         do{
-                            print(SEkeyPair!.privateKey.hashValue as Any)
-                            print("private Key: "+String((SEkeyPair?.privateKey.hashValue)!))
-                            encryptedText = try enclaveManager.encrypt_data(data: input.data(using: .utf8)!, publicKey: SEkeyPair!.publicKey).base64EncodedString()
-                            
+                            print(keyPair!.privateKey.hashValue as Any)
+                            print("private Key: "+String((keyPair?.privateKey.hashValue)!))
+                            encrypted_value = try key_handle.encrypt_data(data: encryption_input.data(using: .utf8)!, publicKey: keyPair!.publicKey).base64EncodedString()
                         } catch {
-                            print("Unbehandelter Error!")
-                        }
-                        //Logik-Methodenaufruf aus Klasse SecureEnclavemanager
-                    }.padding(.vertical, 8).padding(.horizontal).cornerRadius(8)
-                    
-                    Button("Decrypt") {
-                        do{
-//                            print("private Key: "+String((SEkeyPair?.privateKey.hashValue)!))
-                            
-                            guard let data = Data(base64Encoded: input) else {
-                                        throw CustomError.runtimeError("Invalid base64 input")
-                                    }
-                            
-                            let decryptedData = try enclaveManager.decrypt_data(data, privateKey: SEkeyPair!.privateKey)
-
-
-                            guard let deText = String(data: decryptedData, encoding: .utf8) else {
-                                throw CustomError.runtimeError("Error converting decrypted data to string")
-                            }
-
-                            decryptedText = deText
-
-                        } catch {
-                            print("Unbehandelter Fehler: \(error)")
-                        }
-                    }.padding(.vertical, 8).padding(.horizontal).cornerRadius(8)
-                    
-                    Button("Switch") {
-                        input = encryptedText
-                    }}
-                HStack{
-                    Button("Signing Data"){
-                        do{
-                            signature = try enclaveManager.signing_data(SEkeyPair!.privateKey, input.data(using: String.Encoding.utf8)! as CFData)!
-                            print("signature = "+String(signature.hashValue))
-                        }catch{
-                            input = ("\(error)")
-                        }
-                    }.padding(.vertical, 8).padding(.horizontal).cornerRadius(8)
-                    
-                    Button("Verify") {
-                        do{
-                            if try enclaveManager.verify_signature(SEkeyPair!.publicKey, input, signature){
-                                input = "true"
-                            }
-                        }catch{
-                            input = "false"
-                        }
-                    }.padding(.vertical, 8).padding(.horizontal).cornerRadius(8)
-                    
-                    Button("getKey") {
-                        do{
-                            let loadedKey = try SecureEnclaveManager.load_key(input)
-                            print("Key Referenze wurde geladen: "+String(loadedKey.hashValue))
-                        }catch{
                             print("\(error)")
                         }
-                    }.padding(.vertical, 8).padding(.horizontal).cornerRadius(8)
+                    }
+                    .padding(.trailing, 20.0)
                 }
+            }
+            .padding(.top, 5.0)
+            
+            VStack(alignment: .leading){
+                Text("Encrypted Value")
+                    .font(.title2)
                 HStack{
-                    Button("StoreKey") {
+                    TextField("Encrypted Value", text: $encrypted_value)
+                        .frame(height: 40.0)
+                        .background(Color.gray.opacity(0.5))
+                        .cornerRadius(10)
+                    Button("Decrypt"){
                         do{
-                            try enclaveManager.storeKey_Keychain(input, SEkeyPair!.privateKey)
-                            print("Key wurde gestored")
+                            //print("private Key: "+String((SEkeyPair?.privateKey.hashValue)!))
+                                                    
+                            guard let data = Data(base64Encoded: encrypted_value)
+                            else {
+                                throw CustomError.runtimeError("Invalid base64 input")
+                            }
+                                                    
+                            var deText = try key_handle.decrypt_data(data, privateKey: keyPair!.privateKey)
+
+
+                            guard let temp_decrypted_value = String(data: deText, encoding: .utf8)
+                            else {
+                                throw CustomError.runtimeError("Error converting decrypted data to string")
+                            }
+                            
+                            decrypted_value = temp_decrypted_value
+                            
+                            } catch {
+                                print("Unbehandelter Fehler: \(error)")
+                            }
+                    }
+                    .padding(.trailing, 20.0)
+                }
+            }
+            .padding(.top, 5.0)
+            
+            VStack(alignment: .leading){
+                Text("Decrypted Value")
+                    .font(.title2)
+                HStack{
+                    TextField("Decrypted Value", text: $decrypted_value)
+                        .frame(height: 40.0)
+                        .background(Color.gray.opacity(0.5))
+                        .cornerRadius(10)
+                }
+            }
+            .padding(.top, 5.0)
+            
+            Divider()
+            
+            Text("Sign & Verify")
+                .font(.title)
+                .multilineTextAlignment(.leading)
+                .padding(4.0)
+            
+            VStack(alignment: .leading){
+                Text("Text to sign")
+                    .font(.title2)
+                HStack{
+                    TextField("Text to sign", text: $sign_input)
+                        .frame(height: 40.0)
+                        .background(Color.gray.opacity(0.5))
+                        .cornerRadius(10)
+                    
+                    Button("Sign"){
+                        do{
+                            temp_signature_value = try key_handle.sign_data(keyPair!.privateKey, sign_input.data(using: String.Encoding.utf8)! as CFData)!
+                            signature_value = String(temp_signature_value.hashValue)
+                            print("Signature = " + String(signature_value))
                         }catch{
                             print("\(error)")
                         }
                     }
-                    Button("SE aviable?") {
-//                        let isAvailable2 = try enclaveManager.initializeModule()
+                    .padding(.trailing, 20.0)
+                }
+            }
+            .padding(.top, 5.0)
+            
+            VStack(alignment: .leading){
+                Text("Signature")
+                    .font(.title2)
+                
+                HStack{
+                    TextField("Signature", text: $signature_value)
+                        .frame(height: 40.0)
+                        .background(Color.gray.opacity(0.5))
+                        .cornerRadius(10)
+                    Button("Verify "){
                         do{
-                            try print("the Secure Enclave is  ("+String(enclaveManager.initializeModule())+")")
+                            if try key_handle.verify_signature(keyPair!.publicKey, sign_input, temp_signature_value) && signature_value == String(temp_signature_value.hashValue){
+                                verify_status = "valid"
+                                print("Signature is valid \(signature_value)" )
+                            }else{
+                                verify_status = "invalid"
+                                print("Signature is invalid")
+                            }
                         }catch{
                             print("\(error)")
                         }
                     }
                 }
             }
+            .padding(.top, 5.0)
+            
+            VStack(alignment: .leading){
+                Text("Verify Status")
+                    .font(.title2)
+                TextField("Verify Status", text: $verify_status)
+                    .frame(height: 40.0)
+                    .background(Color.gray.opacity(0.5))
+                    .cornerRadius(10)
+                
+            }
+            .padding(.top, 5.0)
+            
+            Button("Clear All"){
+                encryption_input = ""
+                encrypted_value = ""
+                decrypted_value = ""
+                sign_input = ""
+                signature_value = ""
+                verify_status = ""
+                print("Everything cleared!")
+            }
+            .padding(/*@START_MENU_TOKEN@*/.all, 5.0/*@END_MENU_TOKEN@*/)
+            .background(Color.red)
+            .foregroundColor(.black)
+            .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
+            .cornerRadius(10)
+        }
         }
     }
 }
-#Preview {
+
+struct ContentView_Previews: PreviewProvider {
+  static var previews: some View {
     ContentView()
+  }
 }
+
+enum CustomError: Error {
+        case runtimeError(String)
+    }
+
