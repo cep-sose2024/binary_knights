@@ -269,7 +269,13 @@ class SecureEnclaveManager{
         return true
     }
     
-    
+    /*
+     Inizializes a module by creating a private key and the associated private key.
+     
+     # Returns
+     
+     A boolean if the module has been inizializes correctly on success, or a 'SecureEnclaveError' on failure.
+     */
     func initializeModule() throws-> Bool  {
         self.privateKey =  P256.KeyAgreement.PrivateKey()
         self.publicKey = privateKey!.publicKey
@@ -282,29 +288,7 @@ class SecureEnclaveManager{
             throw SecureEnclaveError.runtimeError("Secure Enclave is not Available on this Device")
         }
         return true
-        
-        
-        
-        /*
-         Inizializes a module by creating a private key and the associated private key.
-         
-         # Returns
-         
-         A boolean if the module has been inizializes correctly on success, or a 'SecureEnclaveError' on failure.
-         */
-        func initializeModule() throws-> Bool  {
-            self.privateKey =  P256.KeyAgreement.PrivateKey()
-            self.publicKey = privateKey!.publicKey
-            self.initialized = true
-            guard self.initialized else{
-                throw SecureEnclaveError.runtimeError("Did not initailze any Module")
-                
-            }
-            guard SecureEnclave.isAvailable else {
-                throw SecureEnclaveError.runtimeError("Secure Enclave is not Available on this Device")
-            }
-            return true
-        }
-        
     }
+        
+    
 }
