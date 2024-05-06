@@ -18,27 +18,27 @@ This is a project in cooperation with j&s-soft GmbH and the Mannheim University 
 
 The following programs are required for the editing environment:
 
-<a href="https://code.visualstudio.com/download"><img src="https://code.visualstudio.com/favicon.ico" alt="Visual Studio Code" width="20" height="20"> Visual Studio Code</a>
+~~<a href="https://code.visualstudio.com/download"><img src="https://code.visualstudio.com/favicon.ico" alt="Visual Studio Code" width="20" height="20"> Visual Studio Code</a>~~
 
 <a href="https://xcodereleases.com/"><img src="https://xcodereleases.com/favicon-32x32.png" alt="Xcode" width="20" height="20"> Xcode</a>
 
-<a href="https://docs.flutter.dev/get-started/install"><img src="https://seekicon.com/free-icon-download/flutter_2.svg" alt="Flutter" width="20" height="20"> Flutter</a>
+~~<a href="https://docs.flutter.dev/get-started/install"><img src="https://seekicon.com/free-icon-download/flutter_2.svg" alt="Flutter" width="20" height="20"> Flutter</a>~~
 
-<a href="https://cocoapods.org/"><img src="https://www.svgrepo.com/show/353570/cocoapods.svg" alt="CocoaPods" width="20" height="20"> CocoaPods</a>
+~~<a href="https://cocoapods.org/"><img src="https://www.svgrepo.com/show/353570/cocoapods.svg" alt="CocoaPods" width="20" height="20"> CocoaPods</a>~~
 
-<a href="https://www.rust-lang.org/tools/install"><img src="https://logodix.com/logo/700854.png" alt="Rust" width="20" height="20"> Rust</a>
+~~<a href="https://www.rust-lang.org/tools/install"><img src="https://logodix.com/logo/700854.png" alt="Rust" width="20" height="20"> Rust</a>~~
 
 #### Important information about the installation of Flutter: 
-The entire "Install the Flutter SDK" tab should be followed!
+~~The entire "Install the Flutter SDK" tab should be followed!~~
 
-If problems with Dart ("That Folder Does not appear to be a Flutter SDK") occur during the installation of Flutter with the tab "Use VS Code to install", then Flutter must be downloaded as an SDK and the downloaded SDK can be selected.
+~~If problems with Dart ("That Folder Does not appear to be a Flutter SDK") occur during the installation of Flutter with the tab "Use VS Code to install", then Flutter must be downloaded as an SDK and the downloaded SDK can be selected.~~
 
 
  
 #### Important information on installing Xcode:
-In Xcode, the path for iOS and macOS is separate, so they are treated as individual projects that can be opened and edited individually.
+~~In Xcode, the path for iOS and macOS is separate, so they are treated as individual projects that can be opened and edited individually.~~
 
-If the error message "That Folder Does not appear to be a Flutter SDK" appears in Visual Studio Code, select "Download SDK" and choose a location outside the project as the storage location.
+~~If the error message "That Folder Does not appear to be a Flutter SDK" appears in Visual Studio Code, select "Download SDK" and choose a location outside the project as the storage location.~~
   
 #
 
