@@ -26,6 +26,9 @@ struct ContentView: View {
         }
 
     var body: some View {
+        ScrollView{
+            
+        
         VStack(alignment: .leading){
             Text("Encryption & Decryption")
                 .font(.title)
@@ -196,7 +199,7 @@ struct ContentView: View {
             .foregroundColor(.black)
             .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
             .cornerRadius(10)
-            
+        }
         }
     }
 }
