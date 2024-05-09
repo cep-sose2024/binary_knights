@@ -1,0 +1,15 @@
+
+fn main() {
+    // Generiere einen neuen Schlüssel mit bestimmten Attributen
+    // let dictonary = CFDictionary::from_CFType_pairs(&[kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly]); 
+    let dictonary = generati_dir("priVAteK$y"); 
+    let key: SecKey = SecKey::generate(dictonary).expect("Fehler bei der Erstellung des Schlüssels"); 
+
+    // // Erstelle eine kryptografische Signatur für einen Datenblock
+    // let data_to_sign = b"Hello, world!";
+    // let signature = private_key.create_signature(Algorithm::ECDSA_SHA256, data_to_sign)?;
+
+    // println!("Signatur: {:?}", signature);
+
+    // Ok(())
+}

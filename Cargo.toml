@@ -1,0 +1,10 @@
+[package]
+name = "security_framework_crate_test"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+core-foundation = "0.9.4"
+security-framework = { version = "2.11.0", features = ["OSX_10_12"] }
