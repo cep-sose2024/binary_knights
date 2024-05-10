@@ -15,6 +15,7 @@ use security_framework::key::SecKey;
 use security_framework::key::Token;
 use security_framework::key::KeyType; 
 use security_framework::key::GenerateKeyOptions;
+use std::env;
 
 fn create_access_control_object() -> Result<SecAccessControl, security_framework::base::Error> {
     let access = SecAccessControl::create_with_protection(
@@ -28,7 +29,7 @@ fn create_access_control_object() -> Result<SecAccessControl, security_framework
 }
 fn generati_dir(privateKeyName: &str) -> CFDictionary{
     let options = GenerateKeyOptions{
-        key_type: Some(KeyType::dsa()),
+        key_type: Some(KeyType::ec()),
         size_in_bits: Some(256), 
         label: Some(String::from(privateKeyName)), 
         token: Some(Token::SecureEnclave), 
@@ -42,6 +43,7 @@ fn generati_dir(privateKeyName: &str) -> CFDictionary{
 }
 
 fn main() {
+    env::set_var("RUST_BACKTRACE", "1");
     let dictionary = generati_dir("priVAteK$y"); 
     let key: SecKey = SecKey::generate(dictionary).expect("Fehler bei der Erstellung der Schlüssel: "); 
 }
