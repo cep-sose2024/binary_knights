@@ -8,6 +8,9 @@ Attempted with the crate mentioned above, but unsuccessful. Understanding how th
 
 Both FFIs were implemented individually, but not in conjunction. To establish bidirectional communication between Rust and Swift and iOS/macOS devices, the implementation of both FFIs is necessary. However, this resulted in Xcode failing to compile the code, thus preventing access to macOS/iOS devices.
 
+![cbindgen & bindgen](pictures/cbindgen_bindgen.png)
+
+
 ## Attempts with swift-rust-bridge:
 
 The above-mentioned Swift Rust bridge could successfully communicate bidirectionally between Rust and Swift. However, due to the implementation, Xcode could not compile, thus hindering access to the device's Secure Enclave.
