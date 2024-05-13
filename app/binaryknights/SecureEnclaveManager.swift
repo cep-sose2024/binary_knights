@@ -6,6 +6,7 @@ import CryptoKit
 class SecureEnclaveManager{
     let algorithm: SecKeyAlgorithm = SecKeyAlgorithm.eciesEncryptionCofactorVariableIVX963SHA256AESGCM
     let sign_algorithm: SecKeyAlgorithm = SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256
+//    let sign_algorithm: SecKeyAlgorithm = SecKeyAlgorithm.ecdsaSignatureDigestX962SHA256
     var privateKey: P256.KeyAgreement.PrivateKey?
     var publicKey: P256.KeyAgreement.PublicKey?
     var initialized: Bool = false
@@ -158,11 +159,17 @@ class SecureEnclaveManager{
         }
         
         var error: Unmanaged<CFError>?
-        guard let signed_data = SecKeyCreateSignature(privateKey, SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256, content as CFData, &error)
+        guard let sign_data = SecKeyCreateSignature(privateKey, sign_algorithm, content as CFData, &error)
         else{
             throw SecureEnclaveError.runtimeError("Data couldn´t be signed")
         }
-        return signed_data
+        
+//        let signedData = sign_data as Data;
+//        let signed_string = signedData.base64EncodedString(options: [])
+//        
+//        return signed_string
+        
+        return sign_data
     }
     
     
@@ -182,14 +189,18 @@ class SecureEnclaveManager{
      
      A boolean if the signature is valid on success, or a 'SecureEnclaveError' on failure.
      */
-    func verify_signature(_ publicKey: SecKey,_ content: String,_ signature: CFData) throws -> Bool{
+    func verify_signature(_ publicKey: SecKey,_ content: String,_ signature: String) throws -> Bool {
+        guard Data(base64Encoded: signature) != nil else{
+            throw SecureEnclaveError.runtimeError("Invalid message to verify")
+        }
+        
         guard let content_data = content.data(using: String.Encoding.utf8)
         else{
             throw SecureEnclaveError.runtimeError("Invalid message to verify")
         }
         
         var error: Unmanaged<CFError>?
-        if SecKeyVerifySignature(publicKey, sign_algorithm, content_data as CFData, signature, &error){
+        if SecKeyVerifySignature(publicKey, sign_algorithm, content_data as CFData, Data(base64Encoded: signature, options: [])! as CFData, &error){
             return true
         } else{
             return false

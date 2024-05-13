@@ -8,8 +8,10 @@ struct ContentView: View {
     @State private var sign_input: String = ""
     @State private var signature_value: String = ""
     @State private var temp_signature_value: CFData = "".data(using: .utf8)! as CFData
+//    @State private var temp_signature_value: String = ""
     @State private var obj_signature_value: CFData = "".data(using: .utf8)! as CFData
-    @State private var verify_status: String = ""
+    @State private var verify_status = false
+    @State private var verify_status_output = ""
     
     /**SwiftUI Backend Variables**/
     private var key_handle = SecureEnclaveManager()
@@ -135,9 +137,9 @@ struct ContentView: View {
                     
                     Button("Sign"){
                         do{
-                            temp_signature_value = try key_handle.sign_data(keyPair!.privateKey, sign_input.data(using: String.Encoding.utf8)! as CFData)!
-                            signature_value = String(temp_signature_value.hashValue)
-                            print("Successfull signed \(sign_input) in \(String(signature_value)) \n")
+                            //String
+                            signature_value = ((try key_handle.sign_data(keyPair!.privateKey, sign_input.data(using: String.Encoding.utf8)! as CFData)!) as Data).base64EncodedString(options: [])
+                            print("Successfull signed \(sign_input) in \(signature_value) \n")
                         }catch{
                             print("\(error)")
                         }
@@ -158,14 +160,17 @@ struct ContentView: View {
                         .cornerRadius(10)
                     Button("Verify "){
                         do{
-                            if try key_handle.verify_signature(keyPair!.publicKey, sign_input, temp_signature_value) && signature_value == String(temp_signature_value.hashValue){
-                                verify_status = "valid"
-                                print("Verify: '\(sign_input)' and '\(signature_value)' is valid" )
-                            }else{
-                                verify_status = "invalid"
+                            var verify_status = try key_handle.verify_signature(keyPair!.publicKey, sign_input, signature_value)
+                            
+                            if verify_status == false {
+                                verify_status_output = "invalid"
                                 print("Verify: '\(sign_input)' and '\(signature_value)' is invalid" )
+                            }else{
+                                verify_status_output = "valid"
+                                print("Verify: '\(sign_input)' and '\(signature_value)' is valid" )
                             }
                         }catch{
+                            verify_status_output = "invalid"
                             print("\(error)")
                         }
                     }
@@ -176,7 +181,7 @@ struct ContentView: View {
             VStack(alignment: .leading){
                 Text("Verify Status")
                     .font(.title2)
-                TextField("Verify Status", text: $verify_status)
+                TextField("Verify Status", text: $verify_status_output)
                     .frame(height: 40.0)
                     .background(Color.gray.opacity(0.5))
                     .cornerRadius(10)
@@ -190,7 +195,8 @@ struct ContentView: View {
                 decrypted_value = ""
                 sign_input = ""
                 signature_value = ""
-                verify_status = ""
+                verify_status = false
+                verify_status_output = ""
                 print("Everything cleared!")
             }
             .padding(/*@START_MENU_TOKEN@*/.all, 5.0/*@END_MENU_TOKEN@*/)
