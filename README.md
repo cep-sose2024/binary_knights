@@ -21,10 +21,10 @@
   <li><a href="#problem">Gibt es Probleme beim Ausführen des Codes?</a></li>
   <li><a href="#zugriffskontrolle">Wie kann man die Zugriffskontrolle bestehen?</a></li>
   <li><a href="#dev_zertifikat">Wo kann ich die Kennung meines Developer-Zertifikat finden?</a></li>
-  <li><a href="entitlements">Wie kann ein Entitlement aussehen?</a></li>
-  <li><a href="enitlement_zuweisen">Was passiert, wenn man der App / Executable Entitlements zuweist?</a></li>
-  <li><a href="loesungen">Gibt es Lösungsansätze?</a></li>
-  <li><a href="commands">Benötigte Commands</a></li>
+  <li><a href="#entitlements">Wie kann ein Entitlement aussehen?</a></li>
+  <li><a href="#enitlement_zuweisen">Was passiert, wenn man der App / Executable Entitlements zuweist?</a></li>
+  <li><a href="#loesungen">Gibt es Lösungsansätze?</a></li>
+  <li><a href="#commands">Benötigte Commands</a></li>
 </ul>
 
 <h2 id="entstehung">Entstehung</h2>
