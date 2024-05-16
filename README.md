@@ -1,5 +1,5 @@
 
-<style>
+<!-- <style>
   .second_section{
     background-color: #272727; 
     border-radius: 10px; 
@@ -7,33 +7,46 @@
     padding-bottom: 2px;  
     margin-top: 10px; 
   }
-</style>
+</style> -->
 
-<p style="text-align: center">
+<p align=center>
     <a href="https://github.com/cep-sose2024/binary_knights/" target="_blank"><img src="documentation/pictures/logoBlack.png" style="width:20%;"></a>
 </p>
 
 <h1>Swift-Library in Rust</h1>
+<p style="font-size:30px;">Gliederung</p>
+<ul>
+  <li><a href="#entstehung">Entstehung</a></li>
+  <li><a href="#code_ausfuehren">Wie kann ich den Code ausführen? </a></li>
+  <li><a href="#problem">Gibt es Probleme beim Ausführen des Codes?</a></li>
+  <li><a href="#zugriffskontrolle">Wie kann man die Zugriffskontrolle bestehen?</a></li>
+  <li><a href="#dev_zertifikat">Wo kann ich die Kennung meines Developer-Zertifikat finden?</a></li>
+  <li><a href="entitlements">Wie kann ein Entitlement aussehen?</a></li>
+  <li><a href="enitlement_zuweisen">Was passiert, wenn man der App / Executable Entitlements zuweist?</a></li>
+  <li><a href="loesungen">Gibt es Lösungsansätze?</a></li>
+  <li><a href="commands">Benötigte Commands</a></li>
+</ul>
 
-<h2>Entstehung</h2>
+<h2 id="entstehung">Entstehung</h2>
 <p>Bei diesem Github-Repo handelt es sich um die Swift-Rust-Brücke von <a>chinedufn</a> orientiert am Beispiel <a href="https://github.com/chinedufn/swift-bridge/tree/ef01d21001914b79e0384627535098e15f87f096/examples/rust-binary-calls-swift-package">rust-binary-calls-swift-package</a>.
 <br>
 Im Ordner `swift-library` wurde unserer SecureEnclaveManager-Code, aus unserer <b>main-Branche</b>, implementiert.
 </p>
-<section class="second_section">
-<h2>Wie kann ich den Code ausführen?</h2>
 
+
+<section class="second_section">
+<h2 id="code_ausfuehren">Wie kann ich den Code ausführen?</h2>
 <p>Dadurch, dass es sich hierbei um eine Swift-Rust-Brücke handelt, geschieht der Zugriff auf den Swift-Code hauptsächlich über Rust. 
 </p>
 
 <p>In der Datei `swift-library --> main.rs` kann man ein Beispiel sehen, wie man mit Rust sich ein KeyPair (Privater + Öffentlicher Schlüssel) in der Secure-Enclave von Apple generieren lassen kann. Dafür muss man die `main.rs` einmal ausführen lassen.
 <br>
 <br>
-Achtung!!!: Es kann sein, dass der Code nicht beim ersten Mal sofort ausgeführt werden kann, weil beim vorherigen Build bei einem anderen Entwickler andere Paths gesetzt wurden. Einmal bitte <a href="#cargoclean">cargo clean</a> ausführen. 
+Achtung!!!: Es kann sein, dass der Code nicht beim ersten Mal sofort ausgeführt werden kann, weil beim vorherigen Build bei einem anderen Entwickler andere Paths gesetzt wurden. Einmal bitte <a href="#cargoclean">cargo clean</a> ausführen und die ".build"-Dateien löschen. 
 </p>
 </section>
 
-<h2>Gibt es Probleme beim Ausführen des Codes?</h2>
+<h2 id="problem">Gibt es Probleme beim Ausführen des Codes?</h2>
 <p>
 Bei der Ausführung der `main.rs` kommt eine Fehlermeldung: "<label style="color: red;>">[...] Domain=NSOSStatusErrorDomain Code-34018 [...]</label>"
 <br>
@@ -46,7 +59,7 @@ Das ist eine Fehlermeldung, die direkt vom MacOS-Betriebssystem kommt. Nach eine
 
 
 <section class="second_section">
-<h3>Wie kann man die Zugriffskontrolle bestehen?</h3>
+<h3 id="zugriffskontrolle">Wie kann man die Zugriffskontrolle bestehen?</h3>
 <p><u>Nach bisherigen Wissenstand:</u><br>
 Bei iOS / MacOS-Apps kann man anhand von gewissen <a href="https://developer.apple.com/library/archive/documentation/Miscellaneous/Reference/EntitlementKeyReference/Chapters/AboutEntitlements.html">".entitlements"</a> die Zugriffsrechte der App oder einer Executable (Mach-O-Datei) setzten. In diesen Entitlements kann gesetzt werden, welche Zugriffsrechte die App / Executable hat. 
 <br>
@@ -60,12 +73,12 @@ Um die Entitlements und das Developer-Zertifkat einer App / Executable mitzugebe
 </section>
 
 
-<h3>Wo kann ich die Kennung meines Developer-Zertifikats finden?</h3>
+<h3 id="dev_zertifikat">Wo kann ich die Kennung meines Developer-Zertifikat finden?</h3>
 Tastenkombination "[cmd] + Leertaste" drücken --> "Schlüsselbundverwaltung" eingeben --> "Schlüsselbundverwaltung öffnen" drücken -->  "Meine Zertifikate" / Oder manuell suchen nach <b>"Apple Development: [E-Mail] ([Kennung])"</b> suchen.
 <hr>
 
 <section class="second_section">
-<h3>Wie kann ein Entitlement aussehen?</h3>
+<h3 id="entitlements">Wie kann ein Entitlement aussehen?</h3>
 Entitlements sind in einem XML-Formatt aufgebaut und können, sowohl mit einem Texteditor, sowie einem Programm von Apple selbst angepasst werden.
 <br>
 Um das Programm von Apple zu benutzen muss das Entitlement die Endung ".entitlement" besitzen und erleichtert es die richtige Formatierung und von Apple vordefinierte Zugriffsmöglichkeiten zu setzen.
@@ -74,7 +87,7 @@ Welcher Content in das Entitlement kommt muss vom Entwickler(-Team) selbst besti
 </section>
 
 <section class="second_section" style="background-color: #7e090057">
-<h2>Was passiert, wenn man der App / Executable Entitlements zuweist?</h2>
+<h2 id="enitlement_zuweisen">Was passiert, wenn man der App / Executable Entitlements zuweist?</h2>
 <p>
 Unter "swift-library_and_rust" --> "target" --> "debug" kann man die Executable (Macho-O) finden und dieser Datei die Entitlements und das Developer-Zertifikat zuweisen. Nach dem dranknüpfen der Entitlements + Developer-Zertifikats startet man die Executable und es kommt sofort zum Absturz der Shell mit der Fehlermeldung "<label style="color: red;">zsh: killed</label>". 
 
@@ -87,7 +100,7 @@ Unter "swift-library_and_rust" --> "target" --> "debug" kann man die Executable 
 </section>
 
 <section class="second_section" style="background-color: #00810d21">
-<h2>Gibt es Lösungsansätze?</h2>
+<h2 id="loesungen">Gibt es Lösungsansätze?</h2>
 Für Punkt 1: <br>
 Es wird eine reine Mach-O Datei erstellt, die in der nativen Apple-Programmiersprache "Swift" geschrieben ist. Diese erhält dieselben Entitlements + Apple Developer Zertifkat, wie das Executsable von Rust. Sollte diese Datei ebenso nicht starten können und dieselbe Fehlermeldung "<label style="color: red;">zsh: killed</label>" erhalten --> Entitlements sind schuld und müssen überarbeitet werden. Evtl. muss wieder Kontakt mit j&s soft aufgenommen werden.<br><br>
 Für Punkt 2: <br>
