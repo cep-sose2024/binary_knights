@@ -1,0 +1,1 @@
+/Users/danielreimer/dev/binary_knights-1/swift-library_and_rust/target/debug/rust-binary-calls-swift-package: /Users/danielreimer/dev/binary_knights-1/swift-library_and_rust/build.rs /Users/danielreimer/dev/binary_knights-1/swift-library_and_rust/src/main.rs
