@@ -40,6 +40,7 @@ fn main() {
         &xcode_path
     );
     println!("cargo:rustc-link-search={}", "/usr/lib/swift");
+    println!("Hello World"); 
 }
 
 fn compile_swift() {
