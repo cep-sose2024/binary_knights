@@ -40,6 +40,7 @@ import CryptoKit
         var error: Unmanaged<CFError>?
         guard let privateKeyReference = SecKeyCreateRandomKey(params as CFDictionary, &error) else {
             throw SecureEnclaveError.runtimeError("Error generating a new public-private key pair. \(String(describing: error))")
+            // throw fatalError(file: "test")
         }
         
         guard let publicKey = getPublicKeyFromPrivateKey(privateKey: privateKeyReference) else {
@@ -57,9 +58,8 @@ import CryptoKit
 func rustcall_create_key(privateKeyName: RustString) -> String {
     // Add-Error-Case: If an Secure Enclave Processor does not exist.
     do{
-        let keys = try create_key(privateKeyName: privateKeyName.toString())!.publicKey as! Data
-        let keysString = keys.base64EncodedString()
-        return keysString
+        let keyPair = try create_key(privateKeyName: "priVAteK$y")
+        return ("Private Key: "+String((keyPair?.privateKey.hashValue)!) + "\nPublic Key: " + String((keyPair?.publicKey.hashValue)!))
     }catch{
         return ("\(error)")
     }
