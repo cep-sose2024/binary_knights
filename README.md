@@ -173,7 +173,7 @@ Furthermore, you can enter <a href="#show_certificats">this command</a> in the t
 <hr>
 
 <section class="second_section">
-<h3 id="entitlements">What can an entitlement look like?</h3>
+<h2 id="entitlements">What can an entitlement look like?</h2>
 Entitlements are structured in an XML format and can be customized using a text editor or an Apple program.
 <br>
 To use Apple's program, the entitlement must have the extension ".entitlement" and makes it easier to set the correct formatting and access options predefined by Apple.
