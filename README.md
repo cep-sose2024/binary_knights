@@ -14,32 +14,26 @@ A Rust-based wrapper for a crypto abstraction layer that accesses the iOS and ma
 
 This is a project in cooperation with j&s-soft GmbH and the Mannheim University of Applied Sciences.
 #
-## Installation
+#### Installation:
 
-The following programs are required for the editing environment:
+In Visual Studio Code, this repo must be opened and a MachO file must be created using the command 
+```
+  cargo build
+```
+must be created. 
+This executable file is created in **"\target\debug "**. This cannot yet be executed due to missing entitlements.
+We generate it as follows:
 
-~~<a href="https://code.visualstudio.com/download"><img src="https://code.visualstudio.com/favicon.ico" alt="Visual Studio Code" width="20" height="20"> Visual Studio Code</a>~~
+Any working Xcode project must be opened in Xcode and the bundle identifier must be set to **en.jssoft.BinaryKnights**.
+The app must then be executed, whereby the entitlements are generated, and the storage location in Xcode can be selected by right-clicking on the app.
+In this location, right-click on the .app and click on the second button to view the content.
+Now open the MacOS folder in the terminal and paste this code:
+```
+codesign -d --entitlements - --xml "binaryknights" | plutil -convert xml1 -o - -
+```
+You will be shown the content of an XML file that you need to copy.
+Now create the file **binaryknights.entitlements** in the folder **"\target\debug "** and paste the copied content there.
 
-<a href="https://xcodereleases.com/"><img src="https://xcodereleases.com/favicon-32x32.png" alt="Xcode" width="20" height="20"> Xcode</a>
-
-~~<a href="https://docs.flutter.dev/get-started/install"><img src="https://seekicon.com/free-icon-download/flutter_2.svg" alt="Flutter" width="20" height="20"> Flutter</a>~~
-
-~~<a href="https://cocoapods.org/"><img src="https://www.svgrepo.com/show/353570/cocoapods.svg" alt="CocoaPods" width="20" height="20"> CocoaPods</a>~~
-
-~~<a href="https://www.rust-lang.org/tools/install"><img src="https://logodix.com/logo/700854.png" alt="Rust" width="20" height="20"> Rust</a>~~
-
-#### Important information about the installation of Flutter: 
-~~The entire "Install the Flutter SDK" tab should be followed!~~
-
-~~If problems with Dart ("That Folder Does not appear to be a Flutter SDK") occur during the installation of Flutter with the tab "Use VS Code to install", then Flutter must be downloaded as an SDK and the downloaded SDK can be selected.~~
-
-
- 
-#### Important information on installing Xcode:
-~~In Xcode, the path for iOS and macOS is separate, so they are treated as individual projects that can be opened and edited individually.~~
-
-~~If the error message "That Folder Does not appear to be a Flutter SDK" appears in Visual Studio Code, select "Download SDK" and choose a location outside the project as the storage location.~~
-  
 #
 
 ### Compability
@@ -73,10 +67,10 @@ The same also applies to MacBooks. In addition, the MacBook Pro 2016 and 2017, w
 <p align=center> <a href="https://support.apple.com/guide/security/secure-enclave-sec59b0b31ff/web" target="_blank"><img src="https://help.apple.com/assets/627EBB4D4FDDD519030FB00A/627EBB504FDDD519030FB012/en_US/9302f62027e1966222080ef2731e45de.png" style="width:60%;"></a> </p>
 
 
-### References
+### ~~References~~
 
-This project is based on [ios-secure-enclave-sample](https://github.com/agestaun/ios-secure-enclave-sample) by [agestaun](https://github.com/agestaun), which is licensed under the MIT License.
-We made several modifications to adapt the code for our project.
+~~This project is based on [ios-secure-enclave-sample](https://github.com/agestaun/ios-secure-enclave-sample) by [agestaun](https://github.com/agestaun), which is licensed under the MIT License.
+We made several modifications to adapt the code for our project.~~
 
 
 
