@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>com.apple.application-identifier</key>
-	<string>9KRX6VHYPS.de.jssoft.-BinaryKnights-1</string>
+	<string>R7Y6NESEQW.de.jssoft.BinaryKnights</string>
 	<key>com.apple.developer.team-identifier</key>
-	<string>9KRX6VHYPS</string>
+	<string>R7Y6NESEQW</string>
 	<key>com.apple.security.app-sandbox</key>
 	<false/>
 	<key>com.apple.security.files.user-selected.read-only</key>
