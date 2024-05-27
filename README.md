@@ -13,12 +13,12 @@ This is a project in cooperation with j&s-soft GmbH and the Mannheim University 
 <ul>
   <li><a href="#installation">Installation</a></li>
   <li><a href="#commands">Commands required</a></li>
-  <li><a href="#code_ausfuehren">How is the code executed?</a></li>
+  <li><a href="#code_ausfuehren">How can I execute the code?</a></li>
   <li><a href="#zugriffskontrolle">How to pass access control?</a></li>
   <li><a href="#dev_zertifikat">Where can I find the identifier of my developer certificate?</a></li>
   <li><a href="#entitlements">What can an Entitlement look like?</a></li>
   <li><a href="#compability">Compatibility</a></li>
-  <li><a href="#secure-enclave">Secure Enclave</a></li>
+  <li><a href="#Secure Enclave">Secure Enclave</a></li>
   <li><a href="#dependencies">Dependencies</a></li>
   <li><a href="#commands">Commands required</a></li>
 </ul>
@@ -151,7 +151,7 @@ As we are working with entitlements and manually add them with  <a href="#">this
 
 
 <section class="second_section">
-<h3 id="zugriffskontrolle">How to pass access control?</h3>
+<h2 id="zugriffskontrolle">How to pass access control?</h2>
 <p><u>According to current knowledge:</u><br>
 With iOS / MacOS apps, you can use certain <a href="https://developer.apple.com/library/archive/documentation/Miscellaneous/Reference/EntitlementKeyReference/Chapters/AboutEntitlements.html">".entitlements"</a> the access rights of the app or of a executable (Mach-O file). The access rights of the app / executable can be set in these entitlements. 
 <br>
@@ -166,7 +166,7 @@ To add the entitlements and the developer certificate to an app / executable, yo
 </section>
 
 
-<h3 id="dev_zertifikat">Where can I find the ID of my developer certificate??</h3>
+<h2 id="dev_zertifikat">Where can I find the ID of my developer certificate??</h2>
 Press the key combination "[cmd] + spacebar" --> Enter "Keychain management" --> Press "Open keychain management" --> "My certificates" / Or search manually for <b>"Apple Development: [e-mail] ([identifier])".
 <br><br>
 Furthermore, you can enter <a href="#show_certificats">this command</a> in the terminal and also display valid certificates that are stored on the system. 
@@ -188,8 +188,7 @@ The content to be included in the Entitlement must be determined and inserted by
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-### Compability
+<h2 id="compability">Compability</h2>
 All the information provided here is taken from Apple`s [Secure Enclave page](https://support.apple.com/guide/security/secure-enclave-sec59b0b31ff/web "Secure Enclave page from Apple"), where Apple also provides a clear overview. All information retrieved here is **as of 21.04.2024**. The "Supported" column indicates whether the iPhone or iMac is supported by our wrapper.
 ##### Iphone
 
@@ -214,13 +213,11 @@ The same also applies to MacBooks. In addition, the MacBook Pro 2016 and 2017, w
 
 # 
 
-
-### Secure Enclave
+<h2 id="Secure Enclave">Secure Enclave</h2>
 > "The Secure Enclave is a dedicated secure subsystem integrated into Apple systems on chip (SoCs). The Secure Enclave is isolated from the main processor to provide an extra layer of security and is designed to keep sensitive user data secure even when the Application Processor kernel becomes compromised. It follows the same design principles as the SoC does—a boot ROM to establish a hardware root of trust, an AES engine for efficient and secure cryptographic operations, and protected memory. Although the Secure Enclave doesn’t include storage, it has a mechanism to store information securely on attached storage separate from the NAND flash storage that’s used by the Application Processor and operating system." ~ <a href="https://support.apple.com/guide/security/secure-enclave-sec59b0b31ff/web">Secure Enclave - Apple</a>
 <p align=center> <a href="https://support.apple.com/guide/security/secure-enclave-sec59b0b31ff/web" target="_blank"><img src="https://help.apple.com/assets/627EBB4D4FDDD519030FB00A/627EBB504FDDD519030FB012/en_US/9302f62027e1966222080ef2731e45de.png" style="width:60%;"></a> </p>
 
 
-### References
 <h2 id="dependencies">Dependencies</h2>
 <p>This Github repo is the Swift-Rust bridge from <a>chinedufn</a> <a href="https://github.com/chinedufn/swift-bridge/tree/ef01d21001914b79e0384627535098e15f87f096/examples/rust-binary-calls-swift-package">rust-binary-calls-swift-package</a>, which is licensed under the MIT License.
 <br>
