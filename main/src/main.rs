@@ -7,6 +7,7 @@ fn main() {
     }else{
         println!("Initialize Module: false")
     }
+    println!("{}", ffi::rustcall_load_key("3344".to_string()));
 }
 
 #[swift_bridge::bridge]
@@ -16,6 +17,7 @@ pub mod ffi{
         // type SecurityError; 
         fn rustcall_create_key(privateKeyName: String) -> String;
         fn initializeModule() -> bool; 
+        fn rustcall_load_key(keyID: String) -> String;
     }
 }
 

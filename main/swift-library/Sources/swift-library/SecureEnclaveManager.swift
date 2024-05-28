@@ -49,6 +49,11 @@ import CryptoKit
         
         let keyPair = SEKeyPair(publicKey: publicKey, privateKey: privateKeyReference)
         
+        do{
+            try storeKey_Keychain(privateKeyName, privateKeyReference)
+        }catch{
+            SecureEnclaveError.runtimeError("\(error)")
+        }
         return keyPair
     }
 
@@ -58,7 +63,7 @@ import CryptoKit
 func rustcall_create_key(privateKeyName: RustString) -> String {
     // Add-Error-Case: If an Secure Enclave Processor does not exist.
     do{
-        let keyPair = try create_key(privateKeyName: "priVAteK$y")
+        let keyPair = try create_key(privateKeyName: privateKeyName.toString())
         return ("Private Key: "+String((keyPair?.privateKey.hashValue)!) + "\nPublic Key: " + String((keyPair?.publicKey.hashValue)!))
     }catch{
         return ("\(error)")
@@ -241,15 +246,15 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
      
      Otionally the key as a SecKey data type on success, or a 'SecureEnclaveError' on failure.
      */
-    func load_key(_ key_id: String) throws -> SecKey? {
-        let tag = key_id.data(using: .utf8)!
+    func load_key(key_id: String) throws -> SecKey? {
+        let tag = key_id
         let query: [String: Any] = [
             kSecClass as String                 : kSecClassKey,
             kSecAttrApplicationTag as String    : tag,
-            kSecAttrKeyType as String           : kSecAttrKeyTypeEC,
+            kSecAttrKeyType as String           : kSecAttrKeyTypeECSECPrimeRandom,
             kSecReturnRef as String             : true
         ]
-        
+
         var item: CFTypeRef?
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         guard status == errSecSuccess else {
@@ -257,6 +262,17 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
         }
         return (item as! SecKey)
     }
+
+    func rustcall_load_key(keyID: RustString) -> String {
+    do {
+        guard let key = try load_key(key_id: keyID.toString()) else {
+            return "Key not found."
+        }
+        return "Loaded Key Hash: \(key.hashValue)"
+    } catch {
+        return "\(error)"
+    }
+}
     
     
     /*
