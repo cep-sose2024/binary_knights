@@ -102,23 +102,30 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
      
      Data that has been encrypted on success, or a 'SecureEnclaveError' on failure.
      */
-    // func encrypt_data(data: Data, publicKey: SecKey) throws -> Data {
-    //     var algorithm = SecKeyAlgorithm.eciesEncryptionCofactorVariableIVX963SHA256AESGCM
-    //     var error: Unmanaged<CFError>?
-    //     let result = SecKeyCreateEncryptedData(publicKey, algorithm, data as CFData, &error)
+    func encrypt_data(data: Data, publicKey: SecKey) throws -> Data {
+        var algorithm = SecKeyAlgorithm.eciesEncryptionCofactorVariableIVX963SHA256AESGCM
+        var error: Unmanaged<CFError>?
+        let result = SecKeyCreateEncryptedData(publicKey, algorithm, data as CFData, &error)
         
-    //     if result == nil {
-    //         throw SecureEnclaveError.runtimeError("Error encrypting data. \(String(describing: error))")
-    //     }
+        if result == nil {
+            throw SecureEnclaveError.runtimeError("Error encrypting data. \(String(describing: error))")
+        }
         
-    //     return result! as Data
-    // }
+        return result! as Data
+    }
 
-    // func rustcall_encrypt_data(data: Data, keyname: String) throws -> RustVec<uint8> {
-    //     let publicKey = getPublicKeyFromPrivateKey(privateKey: try load_key(keyname)!)
-    //     let data = 
-    //     try encrypt_data(data: data, publicKey: publicKey!)
-    // }
+    func rustcall_encrypt_data(data: RustString, keyname: RustString) -> String {
+    do{
+        let privateKey: SecKey = try load_key(key_id: keyname.toString())!
+        let publicKey = getPublicKeyFromPrivateKey(privateKey: privateKey)
+        let encryptedData: Data = try encrypt_data(data: data.toString().data(using: String.Encoding.utf8)!, publicKey: publicKey!)
+        let encryptedData_string = encryptedData.base64EncodedString()
+        return ("Encrypted data: \(encryptedData_string)")
+    }catch{
+        return ("\(error)")
+    }
+
+}
     
     
     /*
