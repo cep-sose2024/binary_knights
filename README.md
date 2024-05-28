@@ -20,7 +20,7 @@ This is a project in cooperation with j&s-soft GmbH and the Mannheim University 
   <li><a href="#compability">Compatibility</a></li>
   <li><a href="#Secure Enclave">Secure Enclave</a></li>
   <li><a href="#dependencies">Dependencies</a></li>
-  <li><a href="#commands">Commands required</a></li>
+  <li><a href="#license">License</a></li>
 </ul>
 
 # 
@@ -228,8 +228,7 @@ Our SecureEnclaveManager code, from our current <b>main branch</b>, has been imp
 We made several modifications to adapt the code for our project.
 
 
-
-## License
+<h2 id="license">License</h2>
 
 [MIT](https://choosealicense.com/licenses/mit/)
 
