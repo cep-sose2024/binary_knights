@@ -190,6 +190,7 @@ The content to be included in the Entitlement must be determined and inserted by
 
 <h2 id="compability">Compability</h2>
 All the information provided here is taken from Apple`s [Secure Enclave page](https://support.apple.com/guide/security/secure-enclave-sec59b0b31ff/web "Secure Enclave page from Apple"), where Apple also provides a clear overview. All information retrieved here is **as of 21.04.2024**. The "Supported" column indicates whether the iPhone or iMac is supported by our wrapper.
+
 ##### Iphone
 
 | iPhone  | SoC| New SE enhancements of each significant SoC | Supported |
@@ -209,7 +210,7 @@ All the information provided here is taken from Apple`s [Secure Enclave page](ht
 
 ##### iMac and MacBook
 The wrapper supports Macs with an Apple Silicon processor or Macs with an Intel processor that have a [T2 security chip](https://support.apple.com/en-us/103265 "T2 security chip").
-The same also applies to MacBooks. In addition, the MacBook Pro 2016 and 2017, which have Touch Bar (these have a T1 security chip), are also supported.
+The same also applies to MacBooks. In addition, the MacBook Pro 2016 and 2017, which have Touch Bar (these have a T1 security chip), are **not** supported.
 
 # 
 
