@@ -184,20 +184,32 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
      
      Optionally data that has been signed as a CFData data type on success, or 'nil' on failure.
      */
-    // func sign_data(_ privateKey: SecKey, _ content: CFData) throws -> CFData? {
+    func sign_data(privateKey: SecKey, content: CFData) throws -> CFData? {
+        let sign_algorithm = SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256
+        if !SecKeyIsAlgorithmSupported(privateKey, SecKeyOperationType.sign, sign_algorithm){
+            throw SecureEnclaveError.runtimeError("Algorithm is not supported")
+        }
         
-    //     if !SecKeyIsAlgorithmSupported(privateKey, SecKeyOperationType.sign, sign_algorithm){
-    //         throw SecureEnclaveError.runtimeError("Algorithm is not supported")
-    //     }
-        
-    //     var error: Unmanaged<CFError>?
-    //     guard let signed_data = SecKeyCreateSignature(privateKey, SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256, content as CFData, &error)
-    //     else{
-    //         throw SecureEnclaveError.runtimeError("Data couldn´t be signed")
-    //     }
-    //     return signed_data
-    // }
+        var error: Unmanaged<CFError>?
+        guard let signed_data = SecKeyCreateSignature(privateKey, sign_algorithm, content as CFData, &error)
+        else{
+            throw SecureEnclaveError.runtimeError("Data couldn´t be signed")
+        }
+        return signed_data
+    }
     
+
+    func rustcall_sign_data(content: RustString, privateKeyName: RustString) -> String{
+        let privateKeyName_string = privateKeyName.toString()
+        let content_string = content.toString().data(using: String.Encoding.utf8)! as CFData
+
+        do {
+            let privateKey = try load_key(key_id: privateKeyName_string)!
+            return try ((sign_data(privateKey: privateKey,content: content_string))! as Data).base64EncodedString(options: [])
+        }catch{
+            return "\(error)"
+        }
+    }
     
     
     /*
