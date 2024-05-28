@@ -98,6 +98,7 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
      Data that has been encrypted on success, or a 'SecureEnclaveError' on failure.
      */
     // func encrypt_data(data: Data, publicKey: SecKey) throws -> Data {
+    //     var algorithm = SecKeyAlgorithm.eciesEncryptionCofactorVariableIVX963SHA256AESGCM
     //     var error: Unmanaged<CFError>?
     //     let result = SecKeyCreateEncryptedData(publicKey, algorithm, data as CFData, &error)
         
@@ -106,6 +107,12 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
     //     }
         
     //     return result! as Data
+    // }
+
+    // func rustcall_encrypt_data(data: Data, keyname: String) throws -> RustVec<uint8> {
+    //     let publicKey = getPublicKeyFromPrivateKey(privateKey: try load_key(keyname)!)
+    //     let data = 
+    //     try encrypt_data(data: data, publicKey: publicKey!)
     // }
     
     
@@ -234,22 +241,22 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
      
      Otionally the key as a SecKey data type on success, or a 'SecureEnclaveError' on failure.
      */
-    // static func load_key(_ key_id: String) throws -> SecKey? {
-    //     let tag = key_id.data(using: .utf8)!
-    //     let query: [String: Any] = [
-    //         kSecClass as String                 : kSecClassKey,
-    //         kSecAttrApplicationTag as String    : tag,
-    //         kSecAttrKeyType as String           : kSecAttrKeyTypeEC,
-    //         kSecReturnRef as String             : true
-    //     ]
+    func load_key(_ key_id: String) throws -> SecKey? {
+        let tag = key_id.data(using: .utf8)!
+        let query: [String: Any] = [
+            kSecClass as String                 : kSecClassKey,
+            kSecAttrApplicationTag as String    : tag,
+            kSecAttrKeyType as String           : kSecAttrKeyTypeEC,
+            kSecReturnRef as String             : true
+        ]
         
-    //     var item: CFTypeRef?
-    //     let status = SecItemCopyMatching(query as CFDictionary, &item)
-    //     guard status == errSecSuccess else {
-    //         throw SecureEnclaveError.runtimeError("Couldn´t find the key")
-    //     }
-    //     return (item as! SecKey)
-    // }
+        var item: CFTypeRef?
+        let status = SecItemCopyMatching(query as CFDictionary, &item)
+        guard status == errSecSuccess else {
+            throw SecureEnclaveError.runtimeError("Couldn´t find the key")
+        }
+        return (item as! SecKey)
+    }
     
     
     /*
@@ -265,7 +272,7 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
      
      A 'SecureEnclaveError' on failure.
      */
-    func storeKey_Keychain(_ name: String, _ privateKey: SecKey) throws{
+    func storeKey_Keychain(_ name: String, _ privateKey: SecKey) throws {
         let key = privateKey
         let tag = name.data(using: .utf8)!
         let addquery: [String: Any] = [kSecClass as String: kSecClassKey,
@@ -290,19 +297,29 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
      
      A boolean if the module has been inizializes correctly on success, or a 'SecureEnclaveError' on failure.
      */
-    // func initializeModule() throws-> Bool  {
-    //     self.privateKey =  P256.KeyAgreement.PrivateKey()
-    //     self.publicKey = privateKey!.publicKey
-    //     self.initialized = true
-    //     guard self.initialized else{
-    //         throw SecureEnclaveError.runtimeError("Did not initailze any Module")
-            
-    //     }
-    //     guard SecureEnclave.isAvailable else {
-    //         throw SecureEnclaveError.runtimeError("Secure Enclave is not Available on this Device")
-    //     }
-    //     return true
-    // }
+    func initializeModule() -> Bool  {
+        if #available(macOS 10.15, *) {
+            var initialized: Bool = true
+            var privateKey: P256.KeyAgreement.PrivateKey?
+            var publicKey: P256.KeyAgreement.PublicKey?
+            do{
+                guard initialized else{
+                    throw SecureEnclaveError.runtimeError("Did not initailze any Module")
+                }
+                guard SecureEnclave.isAvailable else {
+                throw SecureEnclaveError.runtimeError("Secure Enclave is not Available on this Device")
+                }  
+            }catch{
+                return false
+            }
+        } else {
+            return true
+        }
+
+        return true
+    }
+
+    
         
     
 // }
