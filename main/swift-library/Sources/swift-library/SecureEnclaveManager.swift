@@ -40,7 +40,6 @@ import CryptoKit
         var error: Unmanaged<CFError>?
         guard let privateKeyReference = SecKeyCreateRandomKey(params as CFDictionary, &error) else {
             throw SecureEnclaveError.runtimeError("Error generating a new public-private key pair. \(String(describing: error))")
-            // throw fatalError(file: "test")
         }
         
         guard let publicKey = getPublicKeyFromPrivateKey(privateKey: privateKeyReference) else {
@@ -185,7 +184,7 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
      Optionally data that has been signed as a CFData data type on success, or 'nil' on failure.
      */
     func sign_data(privateKey: SecKey, content: CFData) throws -> CFData? {
-        let sign_algorithm = SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256
+        let sign_algorithm = SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256;
         if !SecKeyIsAlgorithmSupported(privateKey, SecKeyOperationType.sign, sign_algorithm){
             throw SecureEnclaveError.runtimeError("Algorithm is not supported")
         }
@@ -201,11 +200,11 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
 
     func rustcall_sign_data(content: RustString, privateKeyName: RustString) -> String{
         let privateKeyName_string = privateKeyName.toString()
-        let content_string = content.toString().data(using: String.Encoding.utf8)! as CFData
+        let content_cfdata = content.toString().data(using: String.Encoding.utf8)! as CFData
 
         do {
             let privateKey = try load_key(key_id: privateKeyName_string)!
-            return try ((sign_data(privateKey: privateKey,content: content_string))! as Data).base64EncodedString(options: [])
+            return try ((sign_data(privateKey: privateKey,content: content_cfdata))! as Data).base64EncodedString(options: [])
         }catch{
             return "\(error)"
         }
@@ -227,7 +226,8 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
      
      A boolean if the signature is valid on success, or a 'SecureEnclaveError' on failure.
      */
-    // func verify_signature(_ publicKey: SecKey,_ content: String,_ signature: CFData) throws -> Bool{
+    // func verify_signature(publicKey: SecKey, content: String, signature: CFData) throws -> Bool{
+    //     let sign_algorithm = SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256
     //     guard let content_data = content.data(using: String.Encoding.utf8)
     //     else{
     //         throw SecureEnclaveError.runtimeError("Invalid message to verify")
@@ -240,6 +240,47 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
     //         return false
     //     }
     // }
+
+        func verify_signature(publicKey: SecKey,content: String, signature: String) throws -> Bool {
+        let sign_algorithm = SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256
+        guard Data(base64Encoded: signature) != nil else{
+            throw SecureEnclaveError.runtimeError("Invalid message to verify")
+        }
+        
+        guard let content_data = content.data(using: String.Encoding.utf8)
+        else{
+            throw SecureEnclaveError.runtimeError("Invalid message to verify")
+        }
+        
+        var error: Unmanaged<CFError>?
+        if SecKeyVerifySignature(publicKey, sign_algorithm, content_data as CFData, Data(base64Encoded: signature, options: [])! as CFData, &error){
+            return true
+        } else{
+            return false
+        }
+    }
+
+    func rustcall_verify_data(publicKeyName: RustString, content: RustString, signature: RustString) -> String{
+        do{
+            let publicKeyName_string = publicKeyName.toString()
+            let content_string = content.toString()
+            let signature_string = signature.toString()
+            guard let publicKey = getPublicKeyFromPrivateKey(privateKey: try load_key(key_id: publicKeyName_string)!)else{
+                throw SecureEnclaveError.runtimeError("Error getting PublicKey from PrivateKey)")
+            }
+            let status = try verify_signature(publicKey: publicKey, content: content_string, signature: signature_string)
+            
+            if status == true{
+                return "true"
+            }else{
+                return "false"
+            }
+
+        }catch{
+            return "\(error)"
+        }
+        return "true"
+    }
     
     
     // Represents errors that can occur within 'SecureEnclaveManager'.

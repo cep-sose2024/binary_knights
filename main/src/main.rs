@@ -8,8 +8,18 @@ fn main() {
         println!("Initialize Module: false")
     }
     println!("LoadKey: {}", ffi::rustcall_load_key("3344".to_string()));
-    println!("Encrypted Data: {}", ffi::rustcall_encrypt_data("Hello World".to_string(), "3344".to_string())); 
-    println!("Signed Data: {}", ffi::rustcall_sign_data("Hello World".to_string(),"3344".to_string()))
+    println!("Encrypted Data: {}", ffi::rustcall_encrypt_data("Hello World".to_string(), "3344".to_string()));
+
+    let signed_data = ffi::rustcall_sign_data("Hello World".to_string(),"3344".to_string()); 
+    println!("Signed Data: {}", signed_data); 
+
+    // if ffi::rustcall_verify_data("3344".to_string(), "Hello World".to_string(), signed_data.to_string()) == true{
+    //     println!("Signed Data: true"); 
+    // }else{
+    //     println!("Verify Data: false"); 
+    // }
+
+    println!("{}", ffi::rustcall_verify_data("3344".to_string(), "Hello World".to_string(), signed_data.to_string())); 
 }
 
 #[swift_bridge::bridge]
@@ -21,7 +31,8 @@ pub mod ffi{
         fn initializeModule() -> bool; 
         fn rustcall_load_key(keyID: String) -> String;
         fn rustcall_encrypt_data(data: String, keyname: String) -> String; 
-        fn rustcall_sign_data(content: String, privateKeyName: String) -> String; 
+        fn rustcall_sign_data(content: String, privateKeyName: String) -> String;
+        fn rustcall_verify_data(publicKeyName: String, content: String, signature: String) -> String; 
     }
 }
 
