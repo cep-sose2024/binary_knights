@@ -132,16 +132,35 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
      
      Data that has been decrypted on success, or a 'SecureEnclaveError' on failure.
      */
-    // func decrypt_data(_ data: Data, privateKey: SecKey) throws -> Data {
-    //     var error: Unmanaged<CFError>?
-    //     let result = SecKeyCreateDecryptedData(privateKey, algorithm, data as CFData, &error)
+    func decrypt_data(data: Data, privateKey: SecKey) throws -> Data {
+        let algorithm: SecKeyAlgorithm = SecKeyAlgorithm.eciesEncryptionCofactorVariableIVX963SHA256AESGCM
+        var error: Unmanaged<CFError>?
+        let result = SecKeyCreateDecryptedData(privateKey, algorithm, data as CFData, &error)
         
-    //     if result == nil {
-    //         throw SecureEnclaveError.runtimeError("Error decrypting data. \(String(describing: error))")
-    //     }
+        if result == nil {
+            throw SecureEnclaveError.runtimeError("Error decrypting data. \(String(describing: error))")
+        }
         
-    //     return result! as Data
-    // }
+        return result! as Data
+    }
+
+    func rustcall_decrypt_data(data: RustString, privateKeyName: RustString) -> String{
+        do{
+            guard let data = Data(base64Encoded: data.toString())
+            else {
+                return ("Invalid base64 input")
+            }
+                                    
+            guard let decrypted_value = String(data: try decrypt_data(data: data, privateKey: load_key(key_id: privateKeyName.toString())!), encoding: .utf8)
+            else {
+                return ("Error converting decrypted data to string")
+            }
+            
+            return ("Successful decrypted: \(data) in \(decrypted_value)")
+        } catch {
+            return ("Fehler: \(error)")
+        }
+    }
     
     
     
