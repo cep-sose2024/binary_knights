@@ -1,6 +1,6 @@
 fn main() {
     //This Teststring is Used in Encrypt, Sign and Verify
-    let testString = "Hello World"; 
+    let test_string = "Hello World"; 
 
     // Modul gets initialized. When initialization was successfull than the process proceed.
     println!("\n"); 
@@ -15,19 +15,19 @@ fn main() {
         println!("Loaded Key Hash: {}", ffi::rustcall_load_key("3344".to_string()));
         println!("\n");
 
-        let encrypted_data = ffi::rustcall_encrypt_data(testString.to_string(), "3344".to_string()); 
-        println!("Encrypted Data of {}:  {}", testString.to_string(), encrypted_data);
+        let encrypted_data = ffi::rustcall_encrypt_data(test_string.to_string(), "3344".to_string()); 
+        println!("Encrypted Data of {}:  {}", test_string.to_string(), encrypted_data);
         println!("\n"); 
 
         let decrypted_data = ffi::rustcall_decrypt_data(encrypted_data, "3344".to_string()); 
         println!("Decrypted Data: {}", decrypted_data); 
         println!("\n"); 
 
-        let signed_data = ffi::rustcall_sign_data(testString.to_string(),"3344".to_string()); 
+        let signed_data = ffi::rustcall_sign_data(test_string.to_string(),"3344".to_string()); 
         println!("Signed Data: {}", signed_data); 
         println!("\n");
 
-        println!("Verify Signature: {}", ffi::rustcall_verify_data("3344".to_string(), testString.to_string(), signed_data.to_string())); 
+        println!("Verify Signature: {}", ffi::rustcall_verify_data("3344".to_string(), test_string.to_string(), signed_data.to_string())); 
         println!("\n"); 
     }else{
         println!("Initialize Module: false")
