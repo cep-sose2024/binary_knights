@@ -2,14 +2,6 @@ import Foundation
 import LocalAuthentication
 import Security
 import CryptoKit
-
-// class SecureEnclaveManager{
-//     let algorithm: SecKeyAlgorithm = SecKeyAlgorithm.eciesEncryptionCofactorVariableIVX963SHA256AESGCM
-//     let sign_algorithm: SecKeyAlgorithm = SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256
-//     var privateKey: P256.KeyAgreement.PrivateKey?
-//     var publicKey: P256.KeyAgreement.PublicKey?
-//     var initialized: Bool = false
-    
     
     /*
      Creates a new cryptographic key pair in the Secure Enclave.
@@ -119,7 +111,7 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
         let publicKey = getPublicKeyFromPrivateKey(privateKey: privateKey)
         let encryptedData: Data = try encrypt_data(data: data.toString().data(using: String.Encoding.utf8)!, publicKey: publicKey!)
         let encryptedData_string = encryptedData.base64EncodedString()
-        return ("Encrypted data: \(encryptedData_string)")
+        return ("\(encryptedData_string)")
     }catch{
         return ("\(error)")
     }
@@ -328,7 +320,7 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
         guard let key = try load_key(key_id: keyID.toString()) else {
             return "Key not found."
         }
-        return "Loaded Key Hash: \(key.hashValue)"
+        return "\(key.hashValue)"
     } catch {
         return "\(error)"
     }
@@ -394,8 +386,3 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
 
         return true
     }
-
-    
-        
-    
-// }
