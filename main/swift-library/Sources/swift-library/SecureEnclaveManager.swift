@@ -93,10 +93,10 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
      
      Data that has been encrypted on success, or a 'SecureEnclaveError' on failure.
      */
-    func encrypt_data(data: Data, publicKey: SecKey) throws -> Data {
-        var algorithm = SecKeyAlgorithm.eciesEncryptionCofactorVariableIVX963SHA256AESGCM
+    func encrypt_data(data: Data, publicKeyName: SecKey) throws -> Data {
+        let algorithm = SecKeyAlgorithm.eciesEncryptionCofactorVariableIVX963SHA256AESGCM
         var error: Unmanaged<CFError>?
-        let result = SecKeyCreateEncryptedData(publicKey, algorithm, data as CFData, &error)
+        let result = SecKeyCreateEncryptedData(publicKeyName, algorithm, data as CFData, &error)
         
         if result == nil {
             throw SecureEnclaveError.runtimeError("Error encrypting data. \(String(describing: error))")
@@ -105,11 +105,11 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
         return result! as Data
     }
 
-    func rustcall_encrypt_data(data: RustString, keyname: RustString) -> String {
+    func rustcall_encrypt_data(data: RustString, publicKeyName: RustString) -> String {
     do{
-        let privateKey: SecKey = try load_key(key_id: keyname.toString())!
+        let privateKey: SecKey = try load_key(key_id: publicKeyName.toString())!
         let publicKey = getPublicKeyFromPrivateKey(privateKey: privateKey)
-        let encryptedData: Data = try encrypt_data(data: data.toString().data(using: String.Encoding.utf8)!, publicKey: publicKey!)
+        let encryptedData: Data = try encrypt_data(data: data.toString().data(using: String.Encoding.utf8)!, publicKeyName: publicKey!)
         let encryptedData_string = encryptedData.base64EncodedString()
         return ("\(encryptedData_string)")
     }catch{
@@ -194,28 +194,29 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
      
      Optionally data that has been signed as a CFData data type on success, or 'nil' on failure.
      */
-    func sign_data(privateKey: SecKey, content: CFData) throws -> CFData? {
+    func sign_data(data: CFData, privateKeyReference: SecKey) throws -> CFData? {
         let sign_algorithm = SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256;
-        if !SecKeyIsAlgorithmSupported(privateKey, SecKeyOperationType.sign, sign_algorithm){
+        if !SecKeyIsAlgorithmSupported(privateKeyReference, SecKeyOperationType.sign, sign_algorithm){
             throw SecureEnclaveError.runtimeError("Algorithm is not supported")
         }
         
         var error: Unmanaged<CFError>?
-        guard let signed_data = SecKeyCreateSignature(privateKey, sign_algorithm, content as CFData, &error)
+        guard let signed_data = SecKeyCreateSignature(privateKeyReference, sign_algorithm, data as CFData, &error)
         else{
-            throw SecureEnclaveError.runtimeError("Data couldn´t be signed")
+            throw SecureEnclaveError.runtimeError("Data couldn´t be signed: \(String(describing: error))")
         }
         return signed_data
     }
     
 
-    func rustcall_sign_data(content: RustString, privateKeyName: RustString) -> String{
+    func rustcall_sign_data(data: RustString, privateKeyName: RustString) -> String{
         let privateKeyName_string = privateKeyName.toString()
-        let content_cfdata = content.toString().data(using: String.Encoding.utf8)! as CFData
+        let data_cfdata = data.toString().data(using: String.Encoding.utf8)! as CFData
 
         do {
-            let privateKey = try load_key(key_id: privateKeyName_string)!
-            return try ((sign_data(privateKey: privateKey,content: content_cfdata))! as Data).base64EncodedString(options: [])
+            let privateKeyReference = try load_key(key_id: privateKeyName_string)!
+            let signed_data = try ((sign_data(data: data_cfdata, privateKeyReference: privateKeyReference))! as Data) 
+            return signed_data.base64EncodedString(options: [])
         }catch{
             return "\(error)"
         }
@@ -237,49 +238,36 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
      
      A boolean if the signature is valid on success, or a 'SecureEnclaveError' on failure.
      */
-    // func verify_signature(publicKey: SecKey, content: String, signature: CFData) throws -> Bool{
-    //     let sign_algorithm = SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256
-    //     guard let content_data = content.data(using: String.Encoding.utf8)
-    //     else{
-    //         throw SecureEnclaveError.runtimeError("Invalid message to verify")
-    //     }
-        
-    //     var error: Unmanaged<CFError>?
-    //     if SecKeyVerifySignature(publicKey, sign_algorithm, content_data as CFData, signature, &error){
-    //         return true
-    //     } else{
-    //         return false
-    //     }
-    // }
 
-        func verify_signature(publicKey: SecKey,content: String, signature: String) throws -> Bool {
+    func verify_signature(publicKey: SecKey, data: String, signature: String) throws -> Bool {
         let sign_algorithm = SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256
         guard Data(base64Encoded: signature) != nil else{
             throw SecureEnclaveError.runtimeError("Invalid message to verify")
         }
         
-        guard let content_data = content.data(using: String.Encoding.utf8)
+        guard let data_data = data.data(using: String.Encoding.utf8)
         else{
             throw SecureEnclaveError.runtimeError("Invalid message to verify")
         }
         
         var error: Unmanaged<CFError>?
-        if SecKeyVerifySignature(publicKey, sign_algorithm, content_data as CFData, Data(base64Encoded: signature, options: [])! as CFData, &error){
+        if SecKeyVerifySignature(publicKey, sign_algorithm, data_data as CFData, Data(base64Encoded: signature, options: [])! as CFData, &error){
             return true
         } else{
             return false
         }
     }
 
-    func rustcall_verify_data(publicKeyName: RustString, content: RustString, signature: RustString) -> String{
+    func rustcall_verify_data(data: RustString, signature: RustString, publicKeyName: RustString) -> String{
         do{
             let publicKeyName_string = publicKeyName.toString()
-            let content_string = content.toString()
+            let data_string = data.toString()
             let signature_string = signature.toString()
+
             guard let publicKey = getPublicKeyFromPrivateKey(privateKey: try load_key(key_id: publicKeyName_string)!)else{
                 throw SecureEnclaveError.runtimeError("Error getting PublicKey from PrivateKey)")
             }
-            let status = try verify_signature(publicKey: publicKey, content: content_string, signature: signature_string)
+            let status = try verify_signature(publicKey: publicKey, data: data_string, signature: signature_string)
             
             if status == true{
                 return "true"
@@ -290,7 +278,6 @@ func rustcall_create_key(privateKeyName: RustString) -> String {
         }catch{
             return "\(error)"
         }
-        return "true"
     }
     
     

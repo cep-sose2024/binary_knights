@@ -1,4 +1,15 @@
+// use std::{path::PathBuf, process::Command};
+
 fn main() {
+    // Ausführen des Signatur-Skripts
+    // let status = Command::new("sh")
+    //     .arg("codesigning.sh")
+    //     .status()
+    //     .expect("Failed to execute codesigning.sh");
+
+    // if !status.success() {
+    //     panic!("codesigning.sh failed");
+    // }
     //This Teststring is Used in Encrypt, Sign and Verify
     let test_string = "Hello World"; 
 
@@ -27,12 +38,11 @@ fn main() {
         println!("Signed Data: {}", signed_data); 
         println!("\n");
 
-        println!("Verify Signature: {}", ffi::rustcall_verify_data("3344".to_string(), test_string.to_string(), signed_data.to_string())); 
+        println!("Verify Signature: {}", ffi::rustcall_verify_data(test_string.to_string(), signed_data.to_string(), "3344".to_string())); 
         println!("\n"); 
     }else{
         println!("Initialize Module: false")
     }
-    
 }
 
 #[swift_bridge::bridge]
@@ -42,9 +52,9 @@ pub mod ffi{
         fn rustcall_create_key(privateKeyName: String) -> String;
         fn initializeModule() -> bool; 
         fn rustcall_load_key(keyID: String) -> String;
-        fn rustcall_encrypt_data(data: String, keyname: String) -> String; 
+        fn rustcall_encrypt_data(data: String, publicKeyName: String) -> String; 
         fn rustcall_decrypt_data(data: String, privateKeyName: String) -> String; 
-        fn rustcall_sign_data(content: String, privateKeyName: String) -> String;
-        fn rustcall_verify_data(publicKeyName: String, content: String, signature: String) -> String; 
+        fn rustcall_sign_data(data: String, privateKeyName: String) -> String;
+        fn rustcall_verify_data(data: String, signature: String, publicKeyName: String) -> String; 
     }
 }

@@ -2,3 +2,8 @@
 # This file contains sensitive information such as account credentials
 # Ignoring it prevents accidentally exposing sensitive data
 .env
+
+codesigning.sh
+.DS_Store
+
+
