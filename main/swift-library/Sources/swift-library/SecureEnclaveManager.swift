@@ -2,7 +2,11 @@ import Foundation
 import LocalAuthentication
 import Security
 import CryptoKit
-    
+
+var algorithm = SecKeyAlgorithm.eciesEncryptionCofactorVariableIVX963SHA224AESGCM
+var sign_algorithm: SecKeyAlgorithm = SecKeyAlgorithm.ecdsaSignatureMessageX962SHA224;
+//let sign_algorithm = SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256;
+
     /**
     Creates a new cryptographic key pair in the Secure Enclave.
      
@@ -102,7 +106,6 @@ import CryptoKit
     Data that has been encrypted on success, or a 'SecureEnclaveError' on failure.
     **/
     func encrypt_data(data: Data, publicKeyName: SecKey) throws -> Data {
-        let algorithm = SecKeyAlgorithm.eciesEncryptionCofactorVariableIVX963SHA256AESGCM
         var error: Unmanaged<CFError>?
         let result = SecKeyCreateEncryptedData(publicKeyName, algorithm, data as CFData, &error)
         
@@ -155,7 +158,7 @@ import CryptoKit
     Data that has been decrypted on success, or a 'SecureEnclaveError' on failure.
     **/
     func decrypt_data(data: Data, privateKey: SecKey) throws -> Data {
-        let algorithm: SecKeyAlgorithm = SecKeyAlgorithm.eciesEncryptionCofactorVariableIVX963SHA256AESGCM
+        //let algorithm: SecKeyAlgorithm = SecKeyAlgorithm.eciesEncryptionCofactorVariableIVX963SHA256AESGCM
         var error: Unmanaged<CFError>?
         let result = SecKeyCreateDecryptedData(privateKey, algorithm, data as CFData, &error)
         
@@ -230,7 +233,6 @@ import CryptoKit
     Optionally data that has been signed as a CFData data type on success, or 'nil' on failure.
     **/
     func sign_data(data: CFData, privateKeyReference: SecKey) throws -> CFData? {
-        let sign_algorithm = SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256;
         if !SecKeyIsAlgorithmSupported(privateKeyReference, SecKeyOperationType.sign, sign_algorithm){
             throw SecureEnclaveError.runtimeError("Algorithm is not supported")
         }
@@ -287,7 +289,7 @@ import CryptoKit
     A boolean if the signature is valid on success, or a 'SecureEnclaveError' on failure.
     **/
     func verify_signature(publicKey: SecKey, data: String, signature: String) throws -> Bool {
-        let sign_algorithm = SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256
+        //let sign_algorithm = SecKeyAlgorithm.ecdsaSignatureMessageX962SHA256
         guard Data(base64Encoded: signature) != nil else{
             throw SecureEnclaveError.runtimeError("Invalid message to verify")
         }
@@ -466,4 +468,256 @@ import CryptoKit
         }
 
         return true
+    }
+
+
+
+
+
+
+    func setAlgorithm(newAlgorithm: RustString) -> String {
+        do{
+            switch newAlgorithm.toString() {        
+            // RSA Encryption
+            case "RsaEncryptionRaw":
+                algorithm = .rsaEncryptionRaw
+            case "RsaEncryptionPKCS1":
+                algorithm = .rsaEncryptionPKCS1
+            case "RsaEncryptionOAEPSHA1":
+                algorithm = .rsaEncryptionOAEPSHA1
+            case "RsaEncryptionOAEPSHA224":
+                algorithm = .rsaEncryptionOAEPSHA224
+            case "RsaEncryptionOAEPSHA256":
+                algorithm = .rsaEncryptionOAEPSHA256
+            case "RsaEncryptionOAEPSHA384":
+                algorithm = .rsaEncryptionOAEPSHA384
+            case "RsaEncryptionOAEPSHA512":
+                algorithm = .rsaEncryptionOAEPSHA512
+            case "RsaEncryptionOAEPSHA1AESGCM":
+                algorithm = .rsaEncryptionOAEPSHA1AESGCM
+            case "RsaEncryptionOAEPSHA224AESGCM":
+                algorithm = .rsaEncryptionOAEPSHA224AESGCM
+            case "RsaEncryptionOAEPSHA256AESGCM":
+                algorithm = .rsaEncryptionOAEPSHA256AESGCM
+            case "RsaEncryptionOAEPSHA384AESGCM":
+                algorithm = .rsaEncryptionOAEPSHA384AESGCM
+            case "RsaEncryptionOAEPSHA512AESGCM":
+                algorithm = .rsaEncryptionOAEPSHA512AESGCM
+
+            // ECIES Encryption
+            case "EciesEncryptionStandardX963SHA1AESGCM":
+                algorithm = .eciesEncryptionStandardX963SHA1AESGCM
+            case "EciesEncryptionStandardX963SHA224AESGCM":
+                algorithm = .eciesEncryptionStandardX963SHA224AESGCM
+            case "EciesEncryptionStandardX963SHA256AESGCM":
+                algorithm = .eciesEncryptionStandardX963SHA256AESGCM
+            case "EciesEncryptionStandardX963SHA384AESGCM":
+                algorithm = .eciesEncryptionStandardX963SHA384AESGCM
+            case "EciesEncryptionStandardX963SHA512AESGCM":
+                algorithm = .eciesEncryptionStandardX963SHA512AESGCM
+            case "EciesEncryptionCofactorX963SHA1AESGCM":
+                algorithm = .eciesEncryptionCofactorX963SHA1AESGCM
+            case "EciesEncryptionCofactorX963SHA224AESGCM":
+                algorithm = .eciesEncryptionCofactorX963SHA224AESGCM
+            case "EciesEncryptionCofactorX963SHA256AESGCM":
+                algorithm = .eciesEncryptionCofactorX963SHA256AESGCM
+            case "EciesEncryptionCofactorX963SHA384AESGCM":
+                algorithm = .eciesEncryptionCofactorX963SHA384AESGCM
+            case "EciesEncryptionCofactorX963SHA512AESGCM":
+                algorithm = .eciesEncryptionCofactorX963SHA512AESGCM
+            case "EciesEncryptionStandardVariableIVX963SHA224AESGCM":
+                algorithm = .eciesEncryptionStandardVariableIVX963SHA224AESGCM
+            case "EciesEncryptionStandardVariableIVX963SHA256AESGCM":
+                algorithm = .eciesEncryptionStandardVariableIVX963SHA256AESGCM
+            case "EciesEncryptionStandardVariableIVX963SHA384AESGCM":
+                algorithm = .eciesEncryptionStandardVariableIVX963SHA384AESGCM
+            case "EciesEncryptionStandardVariableIVX963SHA512AESGCM":
+                algorithm = .eciesEncryptionStandardVariableIVX963SHA512AESGCM
+            case "EciesEncryptionCofactorVariableIVX963SHA224AESGCM":
+                algorithm = .eciesEncryptionCofactorVariableIVX963SHA224AESGCM
+            case "EciesEncryptionCofactorVariableIVX963SHA256AESGCM":
+                algorithm = .eciesEncryptionCofactorVariableIVX963SHA256AESGCM
+            case "EciesEncryptionCofactorVariableIVX963SHA384AESGCM":
+                algorithm = .eciesEncryptionCofactorVariableIVX963SHA384AESGCM
+            case "EciesEncryptionCofactorVariableIVX963SHA512AESGCM":
+                algorithm = .eciesEncryptionCofactorVariableIVX963SHA512AESGCM
+
+            // ECDH Key Exchange
+            case "EcdhKeyExchangeStandard":
+                algorithm = .ecdhKeyExchangeStandard
+            case "EcdhKeyExchangeStandardX963SHA1":
+                algorithm = .ecdhKeyExchangeStandardX963SHA1
+            case "EcdhKeyExchangeStandardX963SHA224":
+                algorithm = .ecdhKeyExchangeStandardX963SHA224
+            case "EcdhKeyExchangeStandardX963SHA256":
+                algorithm = .ecdhKeyExchangeStandardX963SHA256
+            case "EcdhKeyExchangeStandardX963SHA384":
+                algorithm = .ecdhKeyExchangeStandardX963SHA384
+            case "EcdhKeyExchangeStandardX963SHA512":
+                algorithm = .ecdhKeyExchangeStandardX963SHA512
+            case "EcdhKeyExchangeCofactor":
+                algorithm = .ecdhKeyExchangeCofactor
+            case "EcdhKeyExchangeCofactorX963SHA1":
+                algorithm = .ecdhKeyExchangeCofactorX963SHA1
+            case "EcdhKeyExchangeCofactorX963SHA224":
+                algorithm = .ecdhKeyExchangeCofactorX963SHA224
+            case "EcdhKeyExchangeCofactorX963SHA256":
+                algorithm = .ecdhKeyExchangeCofactorX963SHA256
+            case "EcdhKeyExchangeCofactorX963SHA384":
+                algorithm = .ecdhKeyExchangeCofactorX963SHA384
+            case "EcdhKeyExchangeCofactorX963SHA512":
+                algorithm = .ecdhKeyExchangeCofactorX963SHA512
+            default:
+                throw SecureEnclaveError.runtimeError("Error generating a new public-private key pair. \(String(describing: newAlgorithm))")
+            }
+        }catch{
+            return "\(error)"
+        }
+        return "The algorithm was set without problems"
+    }
+
+
+    func setSigitureAlgorithm(new_Sign_algorithm: RustString) -> String {
+        do{
+            switch new_Sign_algorithm.toString() {
+            // RSA Signatures
+            case "RsaSignatureRaw":
+                sign_algorithm = .rsaSignatureRaw
+            case "RsaSignatureDigestPKCS1v15Raw":
+                sign_algorithm = .rsaSignatureDigestPKCS1v15Raw
+            case "RsaSignatureDigestPKCS1v15SHA1":
+                sign_algorithm = .rsaSignatureDigestPKCS1v15SHA1
+            case "RsaSignatureDigestPKCS1v15SHA224":
+                sign_algorithm = .rsaSignatureDigestPKCS1v15SHA224
+            case "RsaSignatureDigestPKCS1v15SHA256":
+                sign_algorithm = .rsaSignatureDigestPKCS1v15SHA256
+            case "RsaSignatureDigestPKCS1v15SHA384":
+                sign_algorithm = .rsaSignatureDigestPKCS1v15SHA384
+            case "RsaSignatureDigestPKCS1v15SHA512":
+                sign_algorithm = .rsaSignatureDigestPKCS1v15SHA512
+            case "RsaSignatureMessagePKCS1v15SHA1":
+                sign_algorithm = .rsaSignatureMessagePKCS1v15SHA1
+            case "RsaSignatureMessagePKCS1v15SHA224":
+                sign_algorithm = .rsaSignatureMessagePKCS1v15SHA224
+            case "RsaSignatureMessagePKCS1v15SHA256":
+                sign_algorithm = .rsaSignatureMessagePKCS1v15SHA256
+            case "RsaSignatureMessagePKCS1v15SHA384":
+                sign_algorithm = .rsaSignatureMessagePKCS1v15SHA384
+            case "RsaSignatureMessagePKCS1v15SHA512":
+                sign_algorithm = .rsaSignatureMessagePKCS1v15SHA512
+            case "RsaSignatureDigestPSSSHA1":
+                sign_algorithm = .rsaSignatureDigestPSSSHA1
+            case "RsaSignatureDigestPSSSHA224":
+                sign_algorithm = .rsaSignatureDigestPSSSHA224
+            case "RsaSignatureDigestPSSSHA256":
+                sign_algorithm = .rsaSignatureDigestPSSSHA256
+            case "RsaSignatureDigestPSSSHA384":
+                sign_algorithm = .rsaSignatureDigestPSSSHA384
+            case "RsaSignatureDigestPSSSHA512":
+                sign_algorithm = .rsaSignatureDigestPSSSHA512
+            
+            // ECDSA Signatures
+            case "EcdsaSignatureDigestX962":
+                sign_algorithm = .ecdsaSignatureDigestX962
+            case "EcdsaSignatureDigestX962SHA1":
+                sign_algorithm = .ecdsaSignatureDigestX962SHA1
+            case "EcdsaSignatureDigestX962SHA224":
+                sign_algorithm = .ecdsaSignatureDigestX962SHA224
+            case "EcdsaSignatureDigestX962SHA256":
+                sign_algorithm = .ecdsaSignatureDigestX962SHA256
+            case "EcdsaSignatureDigestX962SHA384":
+                sign_algorithm = .ecdsaSignatureDigestX962SHA384
+            case "EcdsaSignatureDigestX962SHA512":
+                sign_algorithm = .ecdsaSignatureDigestX962SHA512
+            case "EcdsaSignatureMessageX962SHA1":
+                sign_algorithm = .ecdsaSignatureMessageX962SHA1
+            case "EcdsaSignatureMessageX962SHA224":
+                sign_algorithm = .ecdsaSignatureMessageX962SHA224
+            case "EcdsaSignatureMessageX962SHA256":
+                sign_algorithm = .ecdsaSignatureMessageX962SHA256
+            case "EcdsaSignatureMessageX962SHA384":
+                sign_algorithm = .ecdsaSignatureMessageX962SHA384
+            case "EcdsaSignatureMessageX962SHA512":
+                sign_algorithm = .ecdsaSignatureMessageX962SHA512
+            case "EcdsaSignatureDigestRFC4754":
+                if #available(macOS 14.0, *) {
+                    sign_algorithm = .ecdsaSignatureDigestRFC4754
+                } else {
+                    throw SecureEnclaveError.runtimeError("Error generating a new public-private key pair. The macOS-Version is not supported for this algorithm!")
+                }
+            case "EcdsaSignatureDigestRFC4754SHA1":
+                if #available(macOS 14.0, *) {
+                    sign_algorithm = .ecdsaSignatureDigestRFC4754SHA1
+                } else {
+                    throw SecureEnclaveError.runtimeError("Error generating a new public-private key pair. The macOS-Version is not supported for this algorithm!")
+                }
+            case "EcdsaSignatureDigestRFC4754SHA224":
+                if #available(macOS 14.0, *) {
+                    sign_algorithm = .ecdsaSignatureDigestRFC4754SHA224
+                } else {
+                    throw SecureEnclaveError.runtimeError("Error generating a new public-private key pair. The macOS-Version is not supported for this algorithm!")
+                }
+            case "EcdsaSignatureDigestRFC4754SHA256":
+                if #available(macOS 14.0, *) {
+                    sign_algorithm = .ecdsaSignatureDigestRFC4754SHA256
+                } else {
+                    throw SecureEnclaveError.runtimeError("Error generating a new public-private key pair. The macOS-Version is not supported for this algorithm!")
+                }
+            case "EcdsaSignatureDigestRFC4754SHA384":
+                if #available(macOS 14.0, *) {
+                    sign_algorithm = .ecdsaSignatureDigestRFC4754SHA384
+                } else {
+                    throw SecureEnclaveError.runtimeError("Error generating a new public-private key pair. The macOS-Version is not supported for this algorithm!")
+                }
+            case "EcdsaSignatureDigestRFC4754SHA512":
+                if #available(macOS 14.0, *) {
+                    sign_algorithm = .ecdsaSignatureDigestRFC4754SHA512
+                } else {
+                    throw SecureEnclaveError.runtimeError("Error generating a new public-private key pair. The macOS-Version is not supported for this algorithm!")
+                }
+            case "EcdsaSignatureMessageRFC4754SHA1":
+                if #available(macOS 14.0, *) {
+                    sign_algorithm = .ecdsaSignatureMessageRFC4754SHA1
+                } else {
+                    throw SecureEnclaveError.runtimeError("Error generating a new public-private key pair. The macOS-Version is not supported for this algorithm!")
+                }
+            case "EcdsaSignatureMessageRFC4754SHA224":
+                if #available(macOS 14.0, *) {
+                    sign_algorithm = .ecdsaSignatureMessageRFC4754SHA224
+                } else {
+                    throw SecureEnclaveError.runtimeError("Error generating a new public-private key pair. The macOS-Version is not supported for this algorithm!")
+                }
+            case "EcdsaSignatureMessageRFC4754SHA256":
+                if #available(macOS 14.0, *) {
+                    sign_algorithm = .ecdsaSignatureMessageRFC4754SHA256
+                } else {
+                    throw SecureEnclaveError.runtimeError("Error generating a new public-private key pair. The macOS-Version is not supported for this algorithm!")
+                }
+            case "EcdsaSignatureMessageRFC4754SHA384":
+                if #available(macOS 14.0, *) {
+                    sign_algorithm = .ecdsaSignatureMessageRFC4754SHA384
+                } else {
+                    throw SecureEnclaveError.runtimeError("Error generating a new public-private key pair. The macOS-Version is not supported for this algorithm!")
+                }
+            case "EcdsaSignatureMessageRFC4754SHA512":
+                if #available(macOS 14.0, *) {
+                    sign_algorithm = .ecdsaSignatureMessageRFC4754SHA512
+                } else {
+                    throw SecureEnclaveError.runtimeError("Error generating a new public-private key pair. The macOS-Version is not supported for this algorithm!")
+                }
+
+            default:
+                throw SecureEnclaveError.runtimeError("Error generating a new public-private key pair. \(String(describing: new_Sign_algorithm))")
+            }
+        }catch{
+            return "\(error)"
+        }
+        return "The signature-algorithm was set without problems"
+    }
+
+    func getAlgorithm() -> String {
+        return "Algorithm = \(algorithm)"
+    }
+    func getSigitureAlgorithm() -> String {
+        return "Algorithm = \(sign_algorithm)"
     }
