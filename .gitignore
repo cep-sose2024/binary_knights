@@ -3,8 +3,9 @@
 # Ignoring it prevents accidentally exposing sensitive data
 .env
 
-codesigning.sh
-.DS_Store
-.vscode
+./main/codesigning.sh
+./main/.DS_Store
+./main/.vscode
+./main/target
 
 
