@@ -1,1 +1,0 @@
-/Users/cep/Documents/GitHub/binary_knights/main/target/debug/rust-binary-calls-swift-package: /Users/cep/Documents/GitHub/binary_knights/main/build.rs /Users/cep/Documents/GitHub/binary_knights/main/src/main.rs
