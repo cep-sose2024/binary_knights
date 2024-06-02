@@ -24,6 +24,10 @@ fn main() {
         Err(e) => println!("Failed to initialize TPM module: {:?}", e),
     }
     
+
+
+
+    
     // let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::P256));
     // let sym_algorithm = Some(BlockCiphers::Aes(SymmetricMode::Cbc, KeyBits::Bits256));
     // let hash = Some(Hash::Sha2(Sha2Bits::Sha256));
