@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-crypto-layer = {version="0.1.0", edition = "2021", path="../binaryknights_rust_crypto", features=["macos", "tpm"]}
+crypto-layer = {version="0.1.0", edition = "2021", path="binaryknights_rust_crypto", features=["macos", "tpm"]}
