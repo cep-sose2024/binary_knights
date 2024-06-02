@@ -1,27 +1,30 @@
-use crypto_layer::common::crypto::algorithms::encryption::EccCurves;
+use crypto_layer::common::crypto::algorithms::encryption::{EccCurves, EccSchemeAlgorithm, SymmetricMode};
+use crypto_layer::common::crypto::algorithms::KeyBits;
 use crypto_layer::common::factory::{SecModules, SecurityModule};
-use crypto_layer::common::traits::key_handle;
-use crypto_layer::common::traits::log_config::LogConfig;
+// use crypto_layer::common::traits::key_handle;
+// use crypto_layer::common::traits::log_config::LogConfig;
 use crypto_layer::tpm::core::instance::TpmType;
-use crypto_layer::common::error::SecurityModuleError;
+// use crypto_layer::common::error::SecurityModuleError;
 use crypto_layer::common::crypto::algorithms::{
     encryption::{AsymmetricEncryption, BlockCiphers},
-    hashes::Hash,
+    // hashes::Hash,
 };
-use crypto_layer::common::crypto::KeyUsage;
+// use crypto_layer::common::crypto::KeyUsage;
+use crypto_layer::tpm::macos::{SecureEnclaveConfig /*TpmProvider*/};
+
 
 use crypto_layer::tpm::macos::logger::SwiftLogger;
 
-use apple_secure_enclave_bindings::keyhandle::getAlgorithm; 
-use apple_secure_enclave_bindings::keyhandle::setAlgorithm; 
+// use apple_secure_enclave_bindings::keyhandle::getAlgorithm; 
+// use apple_secure_enclave_bindings::keyhandle::setAlgorithm; 
 
 
 fn main() {
 
     // Creating a TPM Provider
-    let key_id = "3344".to_string();
+    let key_id = "3344";
     let swiftlogger = Box::new(SwiftLogger); 
-    let tpm_provider = SecModules::get_instance(key_id, SecurityModule::Tpm(TpmType::default()), Some(swiftlogger))
+    let tpm_provider = SecModules::get_instance(key_id.to_string(), SecurityModule::Tpm(TpmType::default()), Some(swiftlogger))
     .expect("Failed to create TPM provider");
 
     // Initializing the TPM Module 
@@ -30,75 +33,56 @@ fn main() {
         Err(e) => println!("Failed to initialize TPM module: {:?}", e),
     }
     
-    let bitlaenge = crypto_layer::common::crypto::algorithms::KeyBits::Bits1024;
-    let eccCurve = EccCurves::BrainpoolP256r1;
-    let EccSchemeAlgorithm = crypto_layer::common::crypto::algorithms::encryption::EccSchemeAlgorithm::EcDsa(eccCurve);
-    let algo = crypto_layer::common::crypto::algorithms::encryption::AsymmetricEncryption::Ecc(EccSchemeAlgorithm);
+    let _bitlaenge = crypto_layer::common::crypto::algorithms::KeyBits::Bits1024;
+    let _ecc_curve = EccCurves::BrainpoolP256r1;
+    let _ecc_scheme_algorithm = crypto_layer::common::crypto::algorithms::encryption::EccSchemeAlgorithm::EcDsa(_ecc_curve);
+    let _algo = crypto_layer::common::crypto::algorithms::encryption::AsymmetricEncryption::Ecc(_ecc_scheme_algorithm);
 
-    print!("Algorithmus = {}", getAlgorithm());
+    // print!("Algorithmus = {}", getAlgorithm());
     
     // println!("{}\n",ffi::getAlgorithm()); crypto_layer::tpm::macos::key_handle
     
 
-    // let sym_algorithm = Some(BlockCiphers::Aes(SymmetricMode::Cbc, KeyBits::Bits256));
+    let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::P256));
+    let sym_algorithm = Some(BlockCiphers::Aes(SymmetricMode::Cbc, KeyBits::Bits256));
     // let hash = Some(Hash::Sha2(Sha2Bits::Sha256));
-
-
-// //* /// Brainpool P256r1 curve.
-//     BrainpoolP256r1,
-//     /// Brainpool P384r1 curve.
-//     BrainpoolP384r1,
-//     /// Brainpool P512r1 curve.
-//     BrainpoolP512r1,
-//     /// Brainpool P638 curve.
-//     BrainpoolP638, */
-
-
-
-
-    // use tpm_poc::common::crypto::algorithms::{KeyBits, encryption::AsymmetricEncryption};
-    // use tpm_poc::common::crypto::algorithms::encryption::{AsymmetricEncryption, EccSchemeAlgorithm, EccCurves};
-
-    // let encryption_method = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::Secp256k1));
-
-
-
-
     // let key_usages = vec![KeyUsage::SignEncrypt, KeyUsage::Decrypt];
     
-    // match tpm_provider.lock().unwrap().create_key(
-    //     "my_key_id",
-    //     key_algorithm,
-    //     sym_algorithm,
-    //     hash,
-    //     key_usages,
-    // ) {
-    //     Ok(()) => println!("Key created successfully"),
-    //     Err(e) => println!("Failed to create key: {:?}", e),
-    // }
+    let config: SecureEnclaveConfig = SecureEnclaveConfig::new(Some(key_algorithm), sym_algorithm); 
 
-    // // Signing Data
-    // let data = b"Hello, world!";
+    match tpm_provider.lock().unwrap().create_key(
+        key_id,
+        Box::new(config),
+    ) {
+        Ok(()) => println!("Key created successfully"),
+        Err(e) => println!("Failed to create key: {:?}", e),
+    }; 
 
-    // match tpm_provider.lock().unwrap().sign_data(data) {
-    //     Ok(signature) => println!("Signature: {:?}", signature),
-    //     Err(e) => println!("Failed to sign data: {:?}", e),
-    // }
+    // Signing Data
+    let data = b"Hello, world!";
 
-    // // Verifying Signature
-    // let data = b"Hello, world!";
-    // let signature = "Test"; // ... obtained signature ...
+    match tpm_provider.lock().unwrap().sign_data(data) {
+        Ok(signature) => println!("Signature: {:?}", signature),
+        Err(e) => println!("Failed to sign data: {:?}", e),
+    }
 
-    // match tpm_provider.lock().unwrap().verify_signature(data, &signature) {
-    //     Ok(valid) => {
-    //         if valid {
-    //             println!("Signature is valid");
-    //         } else {
-    //             println!("Signature is invalid");
-    //         }
-    //     }
-    //     Err(e) => println!("Failed to verify signature: {:?}", e),
-    // }
+    // Verifying Signature
+    let data = b"Hello, world!";
+    let signature = b"Test"; // ... obtained signature ...
+
+    match tpm_provider.lock().unwrap().verify_signature(data, signature) {
+        Ok(valid) => {
+            if valid {
+                println!("Signature is valid");
+            } else {
+                println!("Signature is invalid");
+            }
+        }
+        Err(e) => println!("Failed to verify signature: {:?}", e),
+    }
+
+    println!("Ende"); 
+
 
     println!("Hello World"); 
 
