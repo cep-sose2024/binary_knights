@@ -13,7 +13,7 @@ use crypto_layer::common::crypto::algorithms::{
 use crypto_layer::tpm::macos::{SecureEnclaveConfig /*TpmProvider*/};
 
 
-use crypto_layer::tpm::macos::logger::SwiftLogger;
+use crypto_layer::tpm::macos::logger::SecureEnclaveLogger;
 
 // use apple_secure_enclave_bindings::keyhandle::getAlgorithm; 
 // use apple_secure_enclave_bindings::keyhandle::setAlgorithm; 
@@ -23,7 +23,7 @@ fn main() {
 
     // Creating a TPM Provider
     let key_id = "3344";
-    let swiftlogger = Box::new(SwiftLogger); 
+    let swiftlogger = Box::new(SecureEnclaveLogger); 
     let tpm_provider = SecModules::get_instance(key_id.to_string(), SecurityModule::Tpm(TpmType::default()), Some(swiftlogger))
     .expect("Failed to create TPM provider");
 
