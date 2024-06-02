@@ -8,15 +8,16 @@ use crypto_layer::common::crypto::algorithms::{
     hashes::Hash,
 };
 use crypto_layer::common::crypto::KeyUsage;
+use crypto_layer::tpm::macos::logger::SwiftLogger;
 
 fn main() {
 
     // Creating a TPM Provider
     let key_id = "3344".to_string();
-    // let log_setup = LogConfig::setup_logging(&self); 
+    let swiftlogger = Box::new(SwiftLogger); 
+    let tpm_provider = SecModules::get_instance(key_id, SecurityModule::Tpm(TpmType::default()), Some(swiftlogger))
+    .expect("Failed to create TPM provider");
 
-    // let tpm_provider = SecModules::get_instance(key_id, SecurityModule::Tpm(TpmType::default()), Some())
-    // .expect("Failed to create TPM provider");
 
     // Initializing the TPM Module 
     // match tpm_provider.lock().unwrap().initialize_module() {
