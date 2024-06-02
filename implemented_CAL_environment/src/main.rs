@@ -18,12 +18,11 @@ fn main() {
     let tpm_provider = SecModules::get_instance(key_id, SecurityModule::Tpm(TpmType::default()), Some(swiftlogger))
     .expect("Failed to create TPM provider");
 
-
     // Initializing the TPM Module 
-    // match tpm_provider.lock().unwrap().initialize_module() {
-    //     Ok(()) => println!("TPM module initialized successfully"),
-    //     Err(e) => println!("Failed to initialize TPM module: {:?}", e),
-    // }
+    match tpm_provider.lock().unwrap().initialize_module() {
+        Ok(()) => println!("TPM module initialized successfully"),
+        Err(e) => println!("Failed to initialize TPM module: {:?}", e),
+    }
     
     // let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::P256));
     // let sym_algorithm = Some(BlockCiphers::Aes(SymmetricMode::Cbc, KeyBits::Bits256));
