@@ -7,10 +7,7 @@ Building for debugging...
 #endif BRIDGING_HEADER_H
        ^
 1 warning generated.
-[4/9] Emitting module swift_library
-[5/9] Compiling swift_library SwiftBridgeCore.swift
-[6/9] Compiling swift_library rust-calls-swift.swift
-[7/9] Compiling swift_library SecureEnclaveManager.swift
+[4/9] Compiling swift_library SecureEnclaveManager.swift
 /Users/cep/Documents/GitHub/binary_knights/implemented_CAL_environment/binaryknights_rust_crypto/src/tpm/macos/main/swift-library/Sources/swift-library/SecureEnclaveManager.swift:48:32: warning: result of call to function returning 'SecureEnclaveError' is unused
             SecureEnclaveError.runtimeError("\(error)")
                                ^           ~~~~~~~~~~~~
@@ -32,10 +29,13 @@ Building for debugging...
 /Users/cep/Documents/GitHub/binary_knights/implemented_CAL_environment/binaryknights_rust_crypto/src/tpm/macos/main/swift-library/Sources/swift-library/SecureEnclaveManager.swift:457:23: note: condition always evaluates to true
                 guard initialized else{
                       ^
+[5/9] Emitting module swift_library
+[6/9] Compiling swift_library rust-calls-swift.swift
+[7/9] Compiling swift_library SwiftBridgeCore.swift
 [8/9] Compiling swift_library swift_library.swift
 [8/10] Write Objects.LinkFileList
 [9/10] Archiving libswift-library.a
-Build complete! (1.10s)
+Build complete! (1.09s)
 cargo:rustc-link-lib=static=swift-library
 cargo:rustc-link-search=/Users/cep/Documents/GitHub/binary_knights/implemented_CAL_environment/binaryknights_rust_crypto/src/tpm/macos/main/swift-library/.build/debug
 cargo:rustc-link-search=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/

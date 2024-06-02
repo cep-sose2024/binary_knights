@@ -1,5 +1,6 @@
-extern crate crypto_layer; 
+use crypto_layer::common::crypto::algorithms::encryption::EccCurves;
 use crypto_layer::common::factory::{SecModules, SecurityModule};
+use crypto_layer::common::traits::key_handle;
 use crypto_layer::common::traits::log_config::LogConfig;
 use crypto_layer::tpm::core::instance::TpmType;
 use crypto_layer::common::error::SecurityModuleError;
@@ -8,7 +9,12 @@ use crypto_layer::common::crypto::algorithms::{
     hashes::Hash,
 };
 use crypto_layer::common::crypto::KeyUsage;
+
 use crypto_layer::tpm::macos::logger::SwiftLogger;
+
+use apple_secure_enclave_bindings::keyhandle::getAlgorithm; 
+use apple_secure_enclave_bindings::keyhandle::setAlgorithm; 
+
 
 fn main() {
 
@@ -24,13 +30,40 @@ fn main() {
         Err(e) => println!("Failed to initialize TPM module: {:?}", e),
     }
     
+    let bitlaenge = crypto_layer::common::crypto::algorithms::KeyBits::Bits1024;
+    let eccCurve = EccCurves::BrainpoolP256r1;
+    let EccSchemeAlgorithm = crypto_layer::common::crypto::algorithms::encryption::EccSchemeAlgorithm::EcDsa(eccCurve);
+    let algo = crypto_layer::common::crypto::algorithms::encryption::AsymmetricEncryption::Ecc(EccSchemeAlgorithm);
 
-
-
+    print!("Algorithmus = {}", getAlgorithm());
     
-    // let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::P256));
+    // println!("{}\n",ffi::getAlgorithm()); crypto_layer::tpm::macos::key_handle
+    
+
     // let sym_algorithm = Some(BlockCiphers::Aes(SymmetricMode::Cbc, KeyBits::Bits256));
     // let hash = Some(Hash::Sha2(Sha2Bits::Sha256));
+
+
+// //* /// Brainpool P256r1 curve.
+//     BrainpoolP256r1,
+//     /// Brainpool P384r1 curve.
+//     BrainpoolP384r1,
+//     /// Brainpool P512r1 curve.
+//     BrainpoolP512r1,
+//     /// Brainpool P638 curve.
+//     BrainpoolP638, */
+
+
+
+
+    // use tpm_poc::common::crypto::algorithms::{KeyBits, encryption::AsymmetricEncryption};
+    // use tpm_poc::common::crypto::algorithms::encryption::{AsymmetricEncryption, EccSchemeAlgorithm, EccCurves};
+
+    // let encryption_method = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::Secp256k1));
+
+
+
+
     // let key_usages = vec![KeyUsage::SignEncrypt, KeyUsage::Decrypt];
     
     // match tpm_provider.lock().unwrap().create_key(
