@@ -1,0 +1,3 @@
+[submodule "implemented_CAL_environment/binaryknights_rust_crypto"]
+	path = implemented_CAL_environment/binaryknights_rust_crypto
+	url = https://github.com/cep-sose2024/binaryknights_rust_crypto.git
