@@ -43,12 +43,13 @@ fn main() {
     // println!("{}\n",ffi::getAlgorithm()); crypto_layer::tpm::macos::key_handle
     
 
-    let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::P256));
-    let sym_algorithm = Some(BlockCiphers::Aes(SymmetricMode::Cbc, KeyBits::Bits256));
+    // let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::P256));
+    let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::P256)); 
+    // let sym_algorithm = Some(BlockCiphers::Aes(SymmetricMode::Cbc, KeyBits::Bits256));
     // let hash = Some(Hash::Sha2(Sha2Bits::Sha256));
     // let key_usages = vec![KeyUsage::SignEncrypt, KeyUsage::Decrypt];
     
-    let config: SecureEnclaveConfig = SecureEnclaveConfig::new(Some(key_algorithm), sym_algorithm); 
+    let config: SecureEnclaveConfig = SecureEnclaveConfig::new(Some(key_algorithm), None); 
 
     match tpm_provider.lock().unwrap().create_key(
         key_id,
