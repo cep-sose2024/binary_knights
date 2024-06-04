@@ -1,23 +1,12 @@
 use crypto_layer::common::crypto::algorithms::encryption::{EccCurves, EccSchemeAlgorithm, SymmetricMode};
 use crypto_layer::common::crypto::algorithms::KeyBits;
 use crypto_layer::common::factory::{SecModules, SecurityModule};
-// use crypto_layer::common::traits::key_handle;
-// use crypto_layer::common::traits::log_config::LogConfig;
 use crypto_layer::tpm::core::instance::TpmType;
-// use crypto_layer::common::error::SecurityModuleError;
 use crypto_layer::common::crypto::algorithms::{
     encryption::{AsymmetricEncryption, BlockCiphers},
-    // hashes::Hash,
 };
-// use crypto_layer::common::crypto::KeyUsage;
 use crypto_layer::tpm::macos::{SecureEnclaveConfig /*TpmProvider*/};
-
-
 use crypto_layer::tpm::macos::logger::SecureEnclaveLogger;
-
-// use apple_secure_enclave_bindings::keyhandle::getAlgorithm; 
-// use apple_secure_enclave_bindings::keyhandle::setAlgorithm; 
-
 
 fn main() {
 
@@ -32,23 +21,16 @@ fn main() {
         Ok(()) => println!("TPM module initialized successfully"),
         Err(e) => println!("Failed to initialize TPM module: {:?}", e),
     }
-    
-    let _bitlaenge = crypto_layer::common::crypto::algorithms::KeyBits::Bits1024;
-    let _ecc_curve = EccCurves::BrainpoolP256r1;
-    let _ecc_scheme_algorithm = crypto_layer::common::crypto::algorithms::encryption::EccSchemeAlgorithm::EcDsa(_ecc_curve);
-    let _algo = crypto_layer::common::crypto::algorithms::encryption::AsymmetricEncryption::Ecc(_ecc_scheme_algorithm);
 
-    // print!("Algorithmus = {}", getAlgorithm());
-    
-    // println!("{}\n",ffi::getAlgorithm()); crypto_layer::tpm::macos::key_handle
-    
+    //Algoritmen Testen Asymmetric
+    // let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::P256)); 
+    // let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::P384)); 
+    // let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::P521)); 
+    let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::Secp256k1)); 
 
-    // let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::P256));
-    let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::P256)); 
-    // let sym_algorithm = Some(BlockCiphers::Aes(SymmetricMode::Cbc, KeyBits::Bits256));
-    // let hash = Some(Hash::Sha2(Sha2Bits::Sha256));
-    // let key_usages = vec![KeyUsage::SignEncrypt, KeyUsage::Decrypt];
-    
+    // Algorithmen Testen Symmetric
+    // let key_algorithm = BlockCiphers::Aes(SymmetricMode::Gcm, KeyBits::Bits256); 
+
     let config: SecureEnclaveConfig = SecureEnclaveConfig::new(Some(key_algorithm), None); 
 
     match tpm_provider.lock().unwrap().create_key(
@@ -65,11 +47,11 @@ fn main() {
     match tpm_provider.lock().unwrap().sign_data(data) {
         Ok(signature) => println!("Signature: {:?}", signature),
         Err(e) => println!("Failed to sign data: {:?}", e),
-    }
+    }; 
 
     // Verifying Signature
     let data = b"Hello, world!";
-    let signature = b"Test"; // ... obtained signature ...
+    let signature: &[u8; 96] = &[77, 69, 85, 67, 73, 65, 75, 121, 66, 56, 87, 113, 81, 50, 120, 72, 73, 99, 75, 67, 70, 78, 106, 70, 84, 106, 106, 76, 84, 112, 121, 113, 75, 78, 66, 79, 120, 48, 68, 68, 66, 56, 67, 68, 115, 122, 102, 69, 65, 105, 69, 65, 52, 77, 70, 70, 69, 109, 67, 100, 113, 75, 121, 51, 120, 88, 86, 69, 73, 104, 82, 67, 66, 117, 86, 87, 85, 68, 121, 108, 86, 98, 80, 83, 52, 90, 88, 53, 70, 115, 107, 66, 87, 116, 99, 61]; 
 
     match tpm_provider.lock().unwrap().verify_signature(data, signature) {
         Ok(valid) => {
@@ -83,8 +65,5 @@ fn main() {
     }
 
     println!("Ende"); 
-
-
-    println!("Hello World"); 
 
 }
