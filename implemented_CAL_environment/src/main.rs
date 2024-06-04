@@ -32,13 +32,27 @@ fn main() {
     // let key_algorithm = BlockCiphers::Aes(SymmetricMode::Gcm, KeyBits::Bits256); 
 
     let config: SecureEnclaveConfig = SecureEnclaveConfig::new(Some(key_algorithm), None); 
-
+    // Create Key
     match tpm_provider.lock().unwrap().create_key(
         key_id,
         Box::new(config),
     ) {
         Ok(()) => println!("Key created successfully"),
         Err(e) => println!("Failed to create key: {:?}", e),
+    }; 
+
+    //Encrypt Data
+    let data = b"Hello, world!";
+
+    match tpm_provider.lock().unwrap().encrypt_data(data) {
+        Ok(encrypted_data) => println!("EncryptedData: {:?}", encrypted_data),
+        Err(e) => println!("Failed to sign data: {:?}", e),
+    }; 
+    
+    let encrypted_data = b"BENhQ662ksZiSQiaANnbD8/Gsr1BH58PzcQAaVq8Lm9QR9kG+4PwVpEHLAdGdhtZuK6ukGbPIdAZod92sFFAAdryX8LjbpjPZvJUjHHJCqnEBwvjWqGfciF2Aso6IQ=="; 
+    match tpm_provider.lock().unwrap().decrypt_data(encrypted_data) {
+        Ok(decrypted_data) => println!("DecryptedData: {:?}", String::from_utf8(decrypted_data)),
+        Err(e) => println!("Failed to sign data: {:?}", e),
     }; 
 
     // Signing Data
