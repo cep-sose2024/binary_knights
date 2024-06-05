@@ -1,11 +1,9 @@
-use crypto_layer::common::crypto::algorithms::encryption::{EccCurves, EccSchemeAlgorithm, SymmetricMode};
-use crypto_layer::common::crypto::algorithms::KeyBits;
+use crypto_layer::common::crypto::algorithms::encryption::{EccCurves, EccSchemeAlgorithm};
+use crypto_layer::common::crypto::algorithms::hashes::Hash;
 use crypto_layer::common::factory::{SecModules, SecurityModule};
 use crypto_layer::tpm::core::instance::TpmType;
-use crypto_layer::common::crypto::algorithms::{
-    encryption::{AsymmetricEncryption, BlockCiphers},
-};
-use crypto_layer::tpm::macos::{SecureEnclaveConfig /*TpmProvider*/};
+use crypto_layer::common::crypto::algorithms::encryption::AsymmetricEncryption;
+use crypto_layer::tpm::macos::SecureEnclaveConfig;
 use crypto_layer::tpm::macos::logger::SecureEnclaveLogger;
 
 fn main() {
@@ -13,47 +11,63 @@ fn main() {
     // Creating a TPM Provider
     let key_id = "3344";
     let swiftlogger = Box::new(SecureEnclaveLogger); 
-    let tpm_provider = SecModules::get_instance(key_id.to_string(), SecurityModule::Tpm(TpmType::default()), Some(swiftlogger))
-    .expect("Failed to create TPM provider");
-
-    // Initializing the TPM Module 
-    match tpm_provider.lock().unwrap().initialize_module() {
-        Ok(()) => println!("TPM module initialized successfully"),
-        Err(e) => println!("Failed to initialize TPM module: {:?}", e),
-    }
+    let tpm_provider = SecModules::get_instance(key_id.to_string(), SecurityModule::Tpm(TpmType::MacOs), Some(swiftlogger))
+    .expect("Failed to create TPM provider"); 
 
     //Algoritmen Testen Asymmetric
     // let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::P256)); 
     // let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::P384)); 
     // let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::P521)); 
-    let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::Secp256k1)); 
-
-    // Algorithmen Testen Symmetric
+    // let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::Secp256k1));
+    let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::Secp256k1));
+    let asym_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::Null);
+    let hash = Hash::Sha1; 
     // let key_algorithm = BlockCiphers::Aes(SymmetricMode::Gcm, KeyBits::Bits256); 
 
-    let config: SecureEnclaveConfig = SecureEnclaveConfig::new(Some(key_algorithm), None); 
+    let config: SecureEnclaveConfig = SecureEnclaveConfig::new(Some(key_algorithm), Some(asym_algorithm), Some(hash)); 
+    
+    println!("\nInitialize Module: - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
+    // Initialize Module
+    match tpm_provider.lock().unwrap().initialize_module() {
+        Ok(()) => println!("TPM module initialized successfully"),
+        Err(e) => println!("Failed to initialize TPM module: {:?}", e),
+    }
+
+    println!("\nLoading Key:  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
+    // Load Key
+    match tpm_provider.lock().unwrap().load_key(key_id, Box::new(config.clone())) {
+        Ok(()) => println!("Key existing"),
+        Err(e) => println!("Failed to initialize TPM module: {:?}", e),
+    }
+    
+    println!("\nCreating Key: - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
+
     // Create Key
-    match tpm_provider.lock().unwrap().create_key(
-        key_id,
-        Box::new(config),
-    ) {
+    match tpm_provider.lock().unwrap().create_key(key_id,Box::new(config.clone())) {
         Ok(()) => println!("Key created successfully"),
         Err(e) => println!("Failed to create key: {:?}", e),
     }; 
 
-    //Encrypt Data
+    println!("\nEncrypt Data:  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
+
+    // Encrypt Data
     let data = b"Hello, world!";
 
     match tpm_provider.lock().unwrap().encrypt_data(data) {
-        Ok(encrypted_data) => println!("EncryptedData: {:?}", encrypted_data),
+        Ok(encrypted_data) => println!("\nEncryptedData as Byte Array: {:?}", encrypted_data),
         Err(e) => println!("Failed to sign data: {:?}", e),
     }; 
+
+    println!("\nDecrypt Data: - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
     
+    // Decrypt Data
     let encrypted_data = b"BENhQ662ksZiSQiaANnbD8/Gsr1BH58PzcQAaVq8Lm9QR9kG+4PwVpEHLAdGdhtZuK6ukGbPIdAZod92sFFAAdryX8LjbpjPZvJUjHHJCqnEBwvjWqGfciF2Aso6IQ=="; 
     match tpm_provider.lock().unwrap().decrypt_data(encrypted_data) {
         Ok(decrypted_data) => println!("DecryptedData: {:?}", String::from_utf8(decrypted_data)),
         Err(e) => println!("Failed to sign data: {:?}", e),
     }; 
+
+    println!("\nSigning Data: - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
 
     // Signing Data
     let data = b"Hello, world!";
@@ -62,6 +76,8 @@ fn main() {
         Ok(signature) => println!("Signature: {:?}", signature),
         Err(e) => println!("Failed to sign data: {:?}", e),
     }; 
+
+    println!("\nVerifying Data: - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
 
     // Verifying Signature
     let data = b"Hello, world!";
