@@ -5,7 +5,6 @@ use crypto_layer::tpm::core::instance::TpmType;
 use crypto_layer::common::crypto::algorithms::encryption::AsymmetricEncryption;
 use crypto_layer::tpm::macos::SecureEnclaveConfig;
 use crypto_layer::tpm::macos::logger::SecureEnclaveLogger;
-use crypto_layer::SecurityModuleError;
 
 fn main() {
 
@@ -47,22 +46,25 @@ fn main() {
     println!("\nEncrypt Data:  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
 
     // Encrypt Data
+    let mut encrypted_data_bytes: Vec<u8> = Vec::new();
     let data = string.as_bytes();
+
     match tpm_provider.lock().unwrap().encrypt_data(data) {
-        Ok(encrypted_data) => println!("\nEncrypted '{}' as Byte Array: \n{:?}", string ,encrypted_data),
+        Ok(encrypted_data) => {
+            encrypted_data_bytes = encrypted_data;
+            println!("\nEncrypted '{}' as Byte Array: \n{:?}", string, encrypted_data_bytes);
+        }
         Err(e) => println!("Failed to encrypt data: {:?}", e),
-    }; 
+    }
+
 
     println!("\nDecrypt Data: - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
     
     // Decrypt Data
-    let encrypted_data_string = "BENhQ662ksZiSQiaANnbD8/Gsr1BH58PzcQAaVq8Lm9QR9kG+4PwVpEHLAdGdhtZuK6ukGbPIdAZod92sFFAAdryX8LjbpjPZvJUjHHJCqnEBwvjWqGfciF2Aso6IQ=="; 
-    let encrypted_data = encrypted_data_string.as_bytes(); 
-
-    match tpm_provider.lock().unwrap().decrypt_data(encrypted_data) {
-        Ok(decrypted_data) => println!("DecryptedData of {}: \n{:?}",encrypted_data_string, String::from_utf8(decrypted_data)),
+    match tpm_provider.lock().unwrap().decrypt_data(&encrypted_data_bytes) {
+        Ok(decrypted_data) => println!("DecryptedData of {}: \n{:?}", String::from_utf8_lossy(&encrypted_data_bytes).to_string(), String::from_utf8(decrypted_data)), // String::from_utf8_lossy(bytes).to_string();
         Err(e) => println!("Failed to decrypt data: {:?}", e),
-    }; 
+    }
 
     println!("\nSigning Data: - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
 
