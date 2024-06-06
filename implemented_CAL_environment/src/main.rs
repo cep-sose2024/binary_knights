@@ -5,6 +5,7 @@ use crypto_layer::tpm::core::instance::TpmType;
 use crypto_layer::common::crypto::algorithms::encryption::AsymmetricEncryption;
 use crypto_layer::tpm::macos::SecureEnclaveConfig;
 use crypto_layer::tpm::macos::logger::SecureEnclaveLogger;
+use crypto_layer::SecurityModuleError;
 
 fn main() {
 
@@ -76,14 +77,15 @@ fn main() {
 
     // Verifying Signature
     let data = string.as_bytes();
-    let signature: &[u8; 96] = &[77, 69, 85, 67, 73, 65, 75, 121, 66, 56, 87, 113, 81, 50, 120, 72, 73, 99, 75, 67, 70, 78, 106, 70, 84, 106, 106, 76, 84, 112, 121, 113, 75, 78, 66, 79, 120, 48, 68, 68, 66, 56, 67, 68, 115, 122, 102, 69, 65, 105, 69, 65, 52, 77, 70, 70, 69, 109, 67, 100, 113, 75, 121, 51, 120, 88, 86, 69, 73, 104, 82, 67, 66, 117, 86, 87, 85, 68, 121, 108, 86, 98, 80, 83, 52, 90, 88, 53, 70, 115, 107, 66, 87, 116, 99, 61]; 
+    let signature: &[u8; 96] = &[77, 69, 81, 67, 73, 66, 49, 90, 85, 85, 72, 67, 53, 82, 68, 75, 121, 122, 83, 107, 100, 104, 119, 111, 112, 100, 101, 74, 52, 83, 88, 89, 110, 48, 84, 79, 104, 122, 111, 70, 70, 115, 103, 113, 98, 80, 57, 97, 65, 105, 65, 55, 118, 73, 69, 107, 80, 110, 51, 85, 75, 117, 110, 68, 105, 68, 115, 54, 69, 48, 90, 51, 76, 88, 49, 106, 102, 97, 117, 81, 88, 105, 73, 105, 114, 105, 72, 74, 114, 112, 52, 110, 98, 65, 61, 61]; 
+    let signature_as_string: String = "[77, 69, 81, 67, 73, 66, 49, 90, 85, 85, 72, 67, 53, 82, 68, 75, 121, 122, 83, 107, 100, 104, 119, 111, 112, 100, 101, 74, 52, 83, 88, 89, 110, 48, 84, 79, 104, 122, 111, 70, 70, 115, 103, 113, 98, 80, 57, 97, 65, 105, 65, 55, 118, 73, 69, 107, 80, 110, 51, 85, 75, 117, 110, 68, 105, 68, 115, 54, 69, 48, 90, 51, 76, 88, 49, 106, 102, 97, 117, 81, 88, 105, 73, 105, 114, 105, 72, 74, 114, 112, 52, 110, 98, 65, 61, 61]".to_string(); 
 
     match tpm_provider.lock().unwrap().verify_signature(data, signature) {
         Ok(valid) => {
             if valid {
-                println!("Signature is valid");
+                println!("Signature of {} and {} is valid", string, signature_as_string);
             } else {
-                println!("Signature is invalid");
+                println!("Signature of {} and {} is invalid", string, signature_as_string);
             }
         }
         Err(e) => println!("Failed to verify signature: {:?}", e),
