@@ -4,5 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-crypto-layer = {version="0.1.0", edition = "2021", path="binaryknights_rust_crypto", features=["macos", "tpm"]}
-apple-secure-enclave-bindings = {edition = "2021", version = "0.1.0", path="binaryknights_rust_crypto/src/tpm/macos/main", name="main"}
+crypto-layer = {version="0.1.0", path="binaryknights_rust_crypto", features=["macos", "tpm"]}
+apple-secure-enclave-bindings = {version = "0.1.0", path="binaryknights_rust_crypto/src/tpm/macos/main"}
