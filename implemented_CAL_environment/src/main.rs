@@ -1,5 +1,5 @@
-use crypto_layer::common::crypto::algorithms::encryption::{EccCurves, EccSchemeAlgorithm};
-use crypto_layer::common::crypto::algorithms::hashes::Hash;
+use crypto_layer::common::crypto::algorithms::hashes::{Hash, Sha2Bits};
+use crypto_layer::common::crypto::algorithms::KeyBits;
 use crypto_layer::common::factory::{SecModules, SecurityModule};
 use crypto_layer::tpm::core::instance::TpmType;
 use crypto_layer::common::crypto::algorithms::encryption::AsymmetricEncryption;
@@ -9,17 +9,17 @@ use crypto_layer::tpm::macos::logger::SecureEnclaveLogger;
 fn main() {
 
     // Creating a TPM Provider
-    let key_id = "3344";
+    let key_id = "Beispiel2";
     let string = "Hello, world!";
     let swiftlogger = Box::new(SecureEnclaveLogger); 
     let tpm_provider = SecModules::get_instance(key_id.to_string(), SecurityModule::Tpm(TpmType::MacOs), Some(swiftlogger))
     .expect("Failed to create TPM provider"); 
 
     //Algoritmen Testen Asymmetric
-    let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::Secp256k1));
-    let asym_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::Null);
-    let hash = Hash::Sha1; 
-    let config: SecureEnclaveConfig = SecureEnclaveConfig::new(Some(key_algorithm), Some(asym_algorithm), Some(hash)); 
+    // let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::Secp256k1));
+    let asym_algorithm = AsymmetricEncryption::Rsa(KeyBits::Bits1024);
+    let hash = Hash::Sha2(Sha2Bits::Sha256); 
+    let config: SecureEnclaveConfig = SecureEnclaveConfig::new( Some(asym_algorithm), Some(hash)); 
     
     println!("\nInitialize Module: - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
     // Initialize Module
@@ -32,7 +32,7 @@ fn main() {
     // Load Key
     match tpm_provider.lock().unwrap().load_key(key_id, Box::new(config.clone())) {
         Ok(()) => println!("Key existing and ready for operations"),
-        Err(e) => println!("Failed to initialize TPM module: {:?}", e),
+        Err(e) => println!("Failed to load Key: {:?}", e),
     }
     
     println!("\nCreating Key: - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
@@ -40,7 +40,7 @@ fn main() {
     // Create Key
     match tpm_provider.lock().unwrap().create_key(key_id,Box::new(config.clone())) {
         Ok(()) => println!("Key created successfully"),
-        Err(e) => println!("Failed to create key: {:?}", e),
+        Err(e) => println!("Failed to create key: {:?}", e)
     }; 
 
     println!("\nEncrypt Data:  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
@@ -69,9 +69,13 @@ fn main() {
     println!("\nSigning Data: - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
 
     // Signing Data
+    let mut signed_data_bytes: Vec<u8> = Vec::new(); 
     let data = string.as_bytes();
+
     match tpm_provider.lock().unwrap().sign_data(data) {
-        Ok(signature) => println!("Signature of '{}' => \n{:?}", string, signature),
+        Ok(signature) => {
+            signed_data_bytes = signature.clone(); 
+            println!("Signature of '{}' => \n{:?}", string, signature)},
         Err(e) => println!("Failed to sign data: {:?}", e),
     }; 
 
@@ -79,15 +83,13 @@ fn main() {
 
     // Verifying Signature
     let data = string.as_bytes();
-    let signature: &[u8; 96] = &[77, 69, 81, 67, 73, 66, 49, 90, 85, 85, 72, 67, 53, 82, 68, 75, 121, 122, 83, 107, 100, 104, 119, 111, 112, 100, 101, 74, 52, 83, 88, 89, 110, 48, 84, 79, 104, 122, 111, 70, 70, 115, 103, 113, 98, 80, 57, 97, 65, 105, 65, 55, 118, 73, 69, 107, 80, 110, 51, 85, 75, 117, 110, 68, 105, 68, 115, 54, 69, 48, 90, 51, 76, 88, 49, 106, 102, 97, 117, 81, 88, 105, 73, 105, 114, 105, 72, 74, 114, 112, 52, 110, 98, 65, 61, 61]; 
-    let signature_as_string: String = "[77, 69, 81, 67, 73, 66, 49, 90, 85, 85, 72, 67, 53, 82, 68, 75, 121, 122, 83, 107, 100, 104, 119, 111, 112, 100, 101, 74, 52, 83, 88, 89, 110, 48, 84, 79, 104, 122, 111, 70, 70, 115, 103, 113, 98, 80, 57, 97, 65, 105, 65, 55, 118, 73, 69, 107, 80, 110, 51, 85, 75, 117, 110, 68, 105, 68, 115, 54, 69, 48, 90, 51, 76, 88, 49, 106, 102, 97, 117, 81, 88, 105, 73, 105, 114, 105, 72, 74, 114, 112, 52, 110, 98, 65, 61, 61]".to_string(); 
 
-    match tpm_provider.lock().unwrap().verify_signature(data, signature) {
+    match tpm_provider.lock().unwrap().verify_signature(data, &signed_data_bytes) {
         Ok(valid) => {
             if valid {
-                println!("Signature of {} and {} is valid", string, signature_as_string);
+                println!("Signature of {} and {:?} is valid", string, signed_data_bytes);
             } else {
-                println!("Signature of {} and {} is invalid", string, signature_as_string);
+                println!("Signature of {} and {:?} is invalid", string, signed_data_bytes);
             }
         }
         Err(e) => println!("Failed to verify signature: {:?}", e),
