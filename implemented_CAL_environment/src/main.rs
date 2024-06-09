@@ -7,10 +7,8 @@ use crypto_layer::tpm::macos::SecureEnclaveConfig;
 use crypto_layer::tpm::macos::logger::Logger;
 
 fn main() {
-
-    // Creating a TPM Provider
-    let key_id = "3344";
-    let string: &str = "Hello, world!";
+    let key_id = "Beispiel4";
+    let string = "Hello, world!";
     let logger = Logger::new_boxed();
     let tpm_provider = SecModules::get_instance(key_id.to_string(), SecurityModule::Tpm(TpmType::MacOs), Some(logger))
     .expect("Failed to create TPM provider"); 
@@ -28,13 +26,6 @@ fn main() {
         Err(e) => println!("Failed to initialize TPM module: {:?}", e),
     }
 
-    println!("\nLoading Key:  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
-    // Load Key
-    match tpm_provider.lock().unwrap().load_key(key_id, Box::new(config.clone())) {
-        Ok(()) => println!("Key existing and ready for operations"),
-        Err(e) => println!("Failed to load Key: {:?}", e),
-    }
-    
     println!("\nCreating Key: - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
 
     // Create Key
@@ -42,6 +33,13 @@ fn main() {
         Ok(()) => println!("Key created successfully"),
         Err(e) => println!("Failed to create key: {:?}", e)
     }; 
+
+    println!("\nLoading Key:  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
+    // Load Key
+    match tpm_provider.lock().unwrap().load_key(key_id, Box::new(config.clone())) {
+        Ok(()) => println!("Key existing and ready for operations"),
+        Err(e) => println!("Failed to load Key: {:?}", e),
+    }
 
     println!("\nEncrypt Data:  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
 
