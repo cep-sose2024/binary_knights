@@ -4,15 +4,15 @@ use crypto_layer::common::factory::{SecModules, SecurityModule};
 use crypto_layer::tpm::core::instance::TpmType;
 use crypto_layer::common::crypto::algorithms::encryption::AsymmetricEncryption;
 use crypto_layer::tpm::macos::SecureEnclaveConfig;
-use crypto_layer::tpm::macos::logger::SecureEnclaveLogger;
+use crypto_layer::tpm::macos::logger::Logger;
 
 fn main() {
 
     // Creating a TPM Provider
-    let key_id = "Beispiel2";
-    let string = "Hello, world!";
-    let swiftlogger = Box::new(SecureEnclaveLogger); 
-    let tpm_provider = SecModules::get_instance(key_id.to_string(), SecurityModule::Tpm(TpmType::MacOs), Some(swiftlogger))
+    let key_id = "3344";
+    let string: &str = "Hello, world!";
+    let logger = Logger::new_boxed();
+    let tpm_provider = SecModules::get_instance(key_id.to_string(), SecurityModule::Tpm(TpmType::MacOs), Some(logger))
     .expect("Failed to create TPM provider"); 
 
     //Algoritmen Testen Asymmetric
