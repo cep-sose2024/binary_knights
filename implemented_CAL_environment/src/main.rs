@@ -5,6 +5,7 @@ use crypto_layer::tpm::core::instance::TpmType;
 use crypto_layer::common::crypto::algorithms::encryption::AsymmetricEncryption;
 use crypto_layer::tpm::macos::SecureEnclaveConfig;
 use crypto_layer::tpm::macos::logger::Logger;
+use crypto_layer::common::crypto::KeyUsage;
 
 fn main() {
     let key_id = "Beispiel4";
@@ -17,6 +18,7 @@ fn main() {
     // let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::Secp256k1));
     let asym_algorithm = AsymmetricEncryption::Rsa(KeyBits::Bits1024);
     let hash = Hash::Sha2(Sha2Bits::Sha256); 
+    let key_usages = vec![KeyUsage::SignEncrypt, KeyUsage::Decrypt];
     let config: SecureEnclaveConfig = SecureEnclaveConfig::new( Some(asym_algorithm), Some(hash)); 
     
     println!("\nInitialize Module: - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
