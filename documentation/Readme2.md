@@ -1,6 +1,6 @@
 
 <p align=center>
-    <a href="https://github.com/cep-sose2024/binary_knights/" target="_blank"><img src="documentation/pictures/logoBlack.png" style="width:20%;"></a>
+    <a href="https://github.com/cep-sose2024/binary_knights/" target="_blank"><img src="pictures/logoBlack.png" style="width:20%;"></a>
 </p>
 
 A Rust-based wrapper for a crypto abstraction layer that accesses the iOS and macOS Secure Enclave processor.
