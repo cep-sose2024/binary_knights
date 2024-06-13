@@ -2,13 +2,13 @@ use crypto_layer::common::crypto::algorithms::hashes::{Hash, Sha2Bits};
 use crypto_layer::common::crypto::algorithms::KeyBits;
 use crypto_layer::common::factory::{SecModules, SecurityModule};
 use crypto_layer::tpm::core::instance::TpmType;
-use crypto_layer::common::crypto::algorithms::encryption::AsymmetricEncryption;
+use crypto_layer::common::crypto::algorithms::encryption::{AsymmetricEncryption, EccCurves, EccSchemeAlgorithm};
 use crypto_layer::tpm::macos::SecureEnclaveConfig;
 use crypto_layer::tpm::macos::logger::Logger;
-use crypto_layer::common::crypto::KeyUsage;
+// use crypto_layer::common::crypto::KeyUsage;
 
 fn main() {
-    let key_id = "Beispiel4";
+    let key_id = "Beispie";
     let string = "Hello, world!";
     let logger = Logger::new_boxed();
     let tpm_provider = SecModules::get_instance(key_id.to_string(), SecurityModule::Tpm(TpmType::MacOs), Some(logger))
@@ -16,10 +16,11 @@ fn main() {
 
     //Algoritmen Testen Asymmetric
     // let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::Secp256k1));
-    let asym_algorithm = AsymmetricEncryption::Rsa(KeyBits::Bits1024);
-    let hash = Hash::Sha2(Sha2Bits::Sha256); 
-    let key_usages = vec![KeyUsage::SignEncrypt, KeyUsage::Decrypt];
-    let config: SecureEnclaveConfig = SecureEnclaveConfig::new( Some(asym_algorithm), Some(hash)); 
+    // let asym_algorithm = AsymmetricEncryption::Rsa(KeyBits::Bits1024);
+    let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::P256));
+    let hash = Hash::Sha1; 
+    // let key_usages = vec![KeyUsage::SignEncrypt, KeyUsage::Decrypt];
+    let config: SecureEnclaveConfig = SecureEnclaveConfig::new( Some(key_algorithm), Some(hash)); 
     
     println!("\nInitialize Module: - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
     // Initialize Module
