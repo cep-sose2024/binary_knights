@@ -16,9 +16,9 @@ fn main() {
 
     //Algoritmen Testen Asymmetric
     // let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::Secp256k1));
-    // let asym_algorithm = AsymmetricEncryption::Rsa(KeyBits::Bits1024);
-    let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::P256));
-    let hash = Hash::Sha1; 
+    let key_algorithm = AsymmetricEncryption::Rsa(KeyBits::Bits1024);
+    // let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::P256));
+    let hash = Hash::Sha2(Sha2Bits::Sha224); 
     // let key_usages = vec![KeyUsage::SignEncrypt, KeyUsage::Decrypt];
     let config: SecureEnclaveConfig = SecureEnclaveConfig::new( Some(key_algorithm), Some(hash)); 
     

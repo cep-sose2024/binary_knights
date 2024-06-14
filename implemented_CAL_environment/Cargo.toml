@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 crypto-layer = {version="0.1.0", path="binaryknights_rust_crypto", features=["macos", "tpm"]}
+openssl-sys = "0.9.102"
