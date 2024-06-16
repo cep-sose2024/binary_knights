@@ -14,6 +14,7 @@ This is a project in cooperation with j&s-soft GmbH and the Mannheim University 
   <li><a href="#installation">Installation</a></li>
   <li><a href="#commands">Commands required</a></li>
   <li><a href="#code_ausfuehren">How can I execute the code?</a></li>
+  <li><a href="#execute_tests">How can I execute cargo tests?</a></li>
   <li><a href="#zugriffskontrolle">How to pass access control?</a></li>
   <li><a href="#dev_zertifikat">Where can I find the identifier of my developer certificate?</a></li>
   <li><a href="#entitlements">What can an Entitlement look like?</a></li>
@@ -26,15 +27,17 @@ This is a project in cooperation with j&s-soft GmbH and the Mannheim University 
 # 
 <h2 id="installation">Installation</h2>
 
-In Visual Studio Code, this repo must be opened and a MachO file must be created using the command 
+In Visual Studio Code, this repo must be opened and a MachO file must be created using the command. 
+<br>
+A Mach-O file is generated with cargo build, which adapts to the system. If you run cargo build on a Mac(book) based on the ARM architecture, the Mach-O file is only made for the ARM architecture. The same applies to Intel and the x84_64 architecture. 
 ```
   cargo build
 ```
-must be created. 
-This executable file is created in **"\target\debug "**. This cannot yet be executed due to missing entitlements.
+
+This executable file is created in **"/target/debug "**. This cannot yet be executed due to missing entitlements.
 We generate it as follows:
 
-Any working Xcode project must be opened in Xcode and the bundle identifier must be set to **en.jssoft.BinaryKnights**.
+Any working Xcode project must be opened in Xcode and the bundle identifier must be set to **de.jssoft.BinaryKnights**.
 The app must then be executed, whereby the entitlements are generated, and the storage location in Xcode can be selected by right-clicking on the app.
 In this location, right-click on the .app and click on the second button to view the content.
 Now open the MacOS folder in the terminal and paste this code:
@@ -42,7 +45,7 @@ Now open the MacOS folder in the terminal and paste this code:
 codesign -d --entitlements - --xml "binaryknights" | plutil -convert xml1 -o - -
 ```
 You will be shown the content of an XML file that you need to copy.
-Now create the file **binaryknights.entitlements** in the folder **"\target\debug "** and paste the copied content there.
+Now create the file **binaryknights.entitlements** in the folder **"/target/debug "** and paste the copied content there.
 
 #
 
@@ -144,6 +147,13 @@ As we are working with entitlements and manually add them with  <a href="#">this
 </li>
 <ul>
 </p>
+</section>
+
+<section class="second_section">
+  <h2 id="execute_tests">How can I execute tests?</h2>
+  <p>At this moment, it´s not possible to execute tests with cargo test. The reason is, that cargo test is repeating the whole build process and generating a new executable. <br>
+   This executable file is without entitlements and unsigned. As a result, access to Apple cryptographic operations is denied and no testable data comes out of the tests (except for the error message that the necessary rights are missing). A solution does not yet exist. 
+  </p>
 </section>
 
 
