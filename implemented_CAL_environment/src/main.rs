@@ -2,7 +2,7 @@ use crypto_layer::common::crypto::algorithms::hashes::{Hash, Sha2Bits};
 use crypto_layer::common::crypto::algorithms::KeyBits;
 use crypto_layer::common::factory::{SecModules, SecurityModule};
 use crypto_layer::tpm::core::instance::TpmType;
-use crypto_layer::common::crypto::algorithms::encryption::{AsymmetricEncryption};
+use crypto_layer::common::crypto::algorithms::encryption::AsymmetricEncryption;
 use crypto_layer::tpm::macos::SecureEnclaveConfig;
 use crypto_layer::tpm::macos::logger::Logger;
 // use crypto_layer::common::crypto::KeyUsage;
