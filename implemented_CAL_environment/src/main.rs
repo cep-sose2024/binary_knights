@@ -12,6 +12,7 @@ use crypto_layer::tpm::macos::logger::Logger;
 fn main() {
     let key_id = "Beispie";
     let string = "Hello, world!";
+    // println!("Länge von Bytes: {}", string.as_bytes().to_vec().len()); 
     let logger = Logger::new_boxed();
     let tpm_provider = SecModules::get_instance(key_id.to_string(), SecurityModule::Tpm(TpmType::MacOs), Some(logger))
     .expect("Failed to create TPM provider"); 
@@ -54,18 +55,19 @@ fn main() {
 
     match tpm_provider.lock().unwrap().encrypt_data(data) {
         Ok(encrypted_data) => {
-            encrypted_data_bytes = encrypted_data;
+            encrypted_data_bytes = encrypted_data.clone();
             println!("\nEncrypted '{}' as Byte Array: \n{:?}", string, encrypted_data_bytes);
         }
         Err(e) => println!("Failed to encrypt data: {:?}", e),
     }
 
+    // println!("Länge der Encrypted Daten {}", encrypted_data_bytes.len()); 
 
     println!("\nDecrypt Data: - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
     
     // Decrypt Data
     match tpm_provider.lock().unwrap().decrypt_data(&encrypted_data_bytes) {
-        Ok(decrypted_data) => println!("DecryptedData of {}: \n{:?}", String::from_utf8_lossy(&encrypted_data_bytes).to_string(), String::from_utf8(decrypted_data)), // String::from_utf8_lossy(bytes).to_string();
+        Ok(decrypted_data) => println!("DecryptedData of {:?}: \n{:?}", &encrypted_data_bytes, String::from_utf8(decrypted_data)), // String::from_utf8_lossy(bytes).to_string();
         Err(e) => println!("Failed to decrypt data: {:?}", e),
     }
 
