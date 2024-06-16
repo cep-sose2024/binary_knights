@@ -7,6 +7,8 @@ use crypto_layer::tpm::macos::SecureEnclaveConfig;
 use crypto_layer::tpm::macos::logger::Logger;
 // use crypto_layer::common::crypto::KeyUsage;
 
+
+
 fn main() {
     let key_id = "Beispie";
     let string = "Hello, world!";
@@ -70,9 +72,8 @@ fn main() {
     println!("\nSigning Data: - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"); 
 
     // Signing Data
-    let mut signed_data_bytes: Vec<u8> = Vec::new(); 
+    let mut signed_data_bytes: Vec<u8> = Vec::new();
     let data = string.as_bytes();
-
     match tpm_provider.lock().unwrap().sign_data(data) {
         Ok(signature) => {
             signed_data_bytes = signature.clone(); 
