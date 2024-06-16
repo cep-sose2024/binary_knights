@@ -5,19 +5,17 @@ use crypto_layer::tpm::core::instance::TpmType;
 use crypto_layer::common::crypto::algorithms::encryption::AsymmetricEncryption;
 use crypto_layer::tpm::macos::SecureEnclaveConfig;
 use crypto_layer::tpm::macos::logger::Logger;
-// use crypto_layer::common::crypto::KeyUsage;
-
 
 
 fn main() {
     let key_id = "Beispie";
     let string = "Hello, world!";
-    // println!("Länge von Bytes: {}", string.as_bytes().to_vec().len()); 
+    // println!("Length of bytes: {}", string.as_bytes().to_vec().len()); 
     let logger = Logger::new_boxed();
     let tpm_provider = SecModules::get_instance(key_id.to_string(), SecurityModule::Tpm(TpmType::MacOs), Some(logger))
     .expect("Failed to create TPM provider"); 
 
-    //Algoritmen Testen Asymmetric
+    //Examples for testing algorithms
     // let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::Secp256k1));
     let key_algorithm = AsymmetricEncryption::Rsa(KeyBits::Bits1024);
     // let key_algorithm = AsymmetricEncryption::Ecc(EccSchemeAlgorithm::EcDsa(EccCurves::P256));
