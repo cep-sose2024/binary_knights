@@ -30,13 +30,12 @@ This is a project in cooperation with j&s-soft GmbH and the Mannheim University 
 
 Security can be guaranteed as the Secure Enclave Processor (main computing power for the Secure Enclave) is isolated and only dedicated for Secure Enclave use. This helps prevent side-channel attacks that depend on malicious software sharing the same execution core as the target software under attack. In addition, the Secure Enclave Processor is designed to operate efficiently at a lower clock speed that helps protect it against clock and power attacks.
 
-<p align=center> <a href="https://support.apple.com/guide/security/secure-enclave-sec59b0b31ff/web" target="_blank"><img src="https://help.apple.com/assets/627EBB4D4FDDD519030FB00A/627EBB504FDDD519030FB012/en_US/9302f62027e1966222080ef2731e45de.png" style="width:60%;"></a> </p>
+<p> <a href="https://support.apple.com/guide/security/secure-enclave-sec59b0b31ff/web" target="_blank"><img src="https://help.apple.com/assets/627EBB4D4FDDD519030FB00A/627EBB504FDDD519030FB012/en_US/9302f62027e1966222080ef2731e45de.png" style="width:50%;"></a> </p>
 
 
 ## Architecture
 
-- Hier ein schönes Bild der Architektur
-- Erklärung der Architektur
+<img src="documentation/pictures/Component_diagram.png" style="width:50%">
 
 ### Crypto Abstraction Layer:
 
@@ -45,18 +44,27 @@ The Crypto Abstraction Layer is provided by j&s-soft GmbH and is used as a compr
 ### Rust Library:
 
 The Rust Code in `lib.rs` is used as an library between the Crypto Abstraction Layer and the Rust-Swift-Bridge. 
-This enables using the Swift functions in Rust. 
+This enables using the Swift functions in Rust and calling them from the Crypto Abstraction Layer.
 
 ### Rust-Swift-Bridge (FFI):
 
 The Rust-Swift-Bridge by chinedufn is used as an FFI (Foreign Function Interface) to make calling Swift functions in Rust possible. 
 Data types can be passed and shared between Rust and Swift. Using the bridge is "safer, more performant and more ergonomic than managing a Rust and Swift FFI by hand" ~ [Swift-Bridge by chinedufn](https://github.com/chinedufn/swift-bridge). 
 Not all data types are supported by the bridge as well as the error handling, that's why strings and booleans are used to keep passing the parameters easy. 
+The reason why this bridge is chosen is that it is the newest in comparison to other Rust-Swift-Bridges. 
+In addition, it also was the easiest to get into it and start coding.
 
 ### Swift Wrapper:
 
 The Swift implementation in ```SecureEnclaveManager.swift```is an important step for accessing the Secure Enclave as the main logic is implemented in Swift. 
 The most essential functions are creating and loading a key, initializing a module, encrypting and decrypting data, and signing and also verifying the signature.
+
+### Security Framework
+
+The Security framework is an important part of the implementation. 
+It works as an API to access the Secure Enclave with already written functions. 
+To keep the security on the implementation, the framework protects information, establishes trust, and controls access to software.
+To read more about this, the documentation is [here](https://developer.apple.com/documentation/Security).
 
 ### Secure Enclave:
 
@@ -109,7 +117,7 @@ The supported algorithms for the wrapper are these ones:
 
 - Signing Algorithms:
     - RSA
-    - ECDSA (heißt bei mac anders, ist eig deprecated)
+    - ECDSA (according to the documentation of Apple, kSecAttrKeyTypeECDSA and kSecAttrKeyTypeECSECPrimeRandom is used instead for ECDSA)
 
 - Hashing Algorithms:
     - SHA224
@@ -154,20 +162,18 @@ It has integrated tools and certificates with the Apple Developer Account have t
 ### Apple Developer Account
 
 For having any access on the Secure Enclave, an [Apple Developer Account](https://developer.apple.com/) is needed for ensuring security on the one hand and for executing the code on physical devices and not only in the simulator.
+Also, it plays a major role for the signing process, described in [Commands](#commands).
 The role for the account has to be set to **App Manager**.
 The Apple Developer Account is also necessary for developing the Swift code, for example for using the Keychain Services to store cryptographic keys securely.
 Furthermore, the entitlements can only be set by using the right Bundle Identifier. 
 
-To do this, the Xcode project has to be opened and under **Signing & Capabilities**, the Bundle Identifier needs to be set to **en.jssoft.BinaryKnights**.
+To do this, the Xcode project has to be opened and under **Signing & Capabilities**, the Bundle Identifier needs to be set to **de.jssoft.BinaryKnights**.
 Also, it is important that the development team is not the Personal Team but the j&s soft team. 
 This is not possible if the role of the Developer Account isn't set to App Manager.
 If the error message is "Failed Registering Bundle Identifier" and "No profiles for 'XXX' were found", then it's probably because of the missing role in the Developer Account. 
 To add an account, logging in with the Apple-ID is necessary.
 
 
-Hier noch das mit den entitlements formulieren
-
-Team ID mit reinnehmen
 
 ### Commands
 
@@ -179,25 +185,160 @@ Now, the Executable can be found in `/main/target/debug/` as a Mach-O (Mach Obje
 
 The created Executable file cannot be executed yet due to missing entitlements. 
 To give the Mach-O file the right entitlements, the command 
-`codesign -d --entitlements - --xml "binaryknights" | plutil -convert xml1 -o - -` has to be used.
+`codesign -f -s "[certificate]" --entitlements "[path to entitlements file]" -o runtime -i "de.jssoft.BinaryKnights" "rustbinary-calls-swift-package"` has to be used.
+
+`codesign` is a tool used to sign code, verifying the identity of the author and ensuring the integrity of the code on macOS.
+
+With `-f`, the code signature is forced to be replaced if the binary is already signed.
+
+With `-s`, the signing identity is specified with the certificate used for signing. 
+For the certificate, a hash of the valid code signing Apple Developer certificate in the keychain has to be used. 
+To find the hash, the coammand `security find-identity -p codesigning -v` has to be used.
+It shows all of the Apple Developer certficates that are stored on the system.
+An example can look like this: `XXXXXXXXXXXXXXXXXXXXXXXXXX "Apple Development: example@mail.com (XXXXXXXXXX)" 1 valid identities found"`.
+In the brackets is the identifier for the Apple Developer certificate. 
+It can be easily found in the Keychain Access under **My Certificates**. 
+
+`--entitlements` specifies the entitlements file that is used, followed by the path to the file.
+
+`-o runtime` is used to enable the hardened runtime to make an exploit more difficult. It is a set of security restrictions by Apple.
+
+`-i` specifies the identifier, in this case the Bundle Identifier that is **de.jssoft.BinaryKnights**.
+
+At the end, the path to the binary has to be set, in this case it is the Mach-O file **rustbinary-calls-swift-package**
+
+Here are more useful commands in terms of entitlements:
+
+- `codesign -d -vvv [file name]`: shows the Bundle Identifier, the format of the file, the Apple Team ID.
+- `codesign -d --entitlements - [file name]`: shows the entitlements that are set on the file.
+- `codesign -d --entitlements - --xml "binaryknights" | plutil -convert xml1 -o - -`: shows the entitlements that are set on the file and converts the output to XML format
+
 
 After every build, a new Executable is generated and the Mach-O file has to be signed with every Executable.
 Before building a new Mach-O file with `cargo build`, `cargo clean` has to be used to delete all generated build files and the Mach-O file itself.
 
+To exectute the Mach-O file, the path has to be typed into the terminal.
 
 
-codesign -f -s „[DEIN ZERTIFIKAT]“ --entitlements "binaryknightsDebug.entitlements" rustbinary-calls-swift-package
 
 ## Code Usage
 
 Here are some usage examples:
 
-- mit Erklärungen jeweils
+In the following code, the used variables for the key ID, used string to encrypt, algorithm etc. are defined for futher usage.
+```rust
+let key_id = "Beispiel4";
+let string = "Hello, world!";
+let logger = Logger::new_boxed();
+let tpm_provider = SecModules::get_instance(key_id.to_string(), SecurityModule::Tpm(TpmType::MacOs), Some(logger)).expect("Failed to create TPM provider"); 
+let asym_algorithm = AsymmetricEncryption::Rsa(KeyBits::Bits1024);
+let hash = Hash::Sha2(Sha2Bits::Sha256); 
+let key_usages = vec![KeyUsage::SignEncrypt, KeyUsage::Decrypt];
+let config: SecureEnclaveConfig = SecureEnclaveConfig::new( Some(asym_algorithm), Some(hash));
+```
 
-- Swift Logik
-- Rust cal
+### Initializing a module
 
-Hier aus der Main.rs
+Before using the cryptographic operations, the Secure Enclave has to be inizialized for accessing the Secure Enclave.
+Here is an example of how to do this:
+
+```rust
+match tpm_provider.lock().unwrap().initialize_module() {
+    Ok(()) => println!("TPM module initialized successfully"),
+    Err(e) => println!("Failed to initialize TPM module: {:?}", e),
+}
+```
+
+### Creating a key
+
+An cryptographic keypair has to be created, a private key and a public key:
+
+```rust
+match tpm_provider.lock().unwrap().create_key(key_id,Box::new(config.clone())) {
+    Ok(()) => println!("Key created successfully"),
+    Err(e) => println!("Failed to create key: {:?}", e)
+}; 
+```
+
+### Loading a key
+
+Loading the key just created is necessary for further cryptographic operations:
+
+```rust
+match tpm_provider.lock().unwrap().load_key(key_id, Box::new(config.clone())) {
+    Ok(()) => println!("Key existing and ready for operations"),
+    Err(e) => println!("Failed to load Key: {:?}", e),
+}
+```
+
+
+### Encryption
+
+Here is an example of how the string `"Hello, world!"` is encrypted.
+It is converted to a byte array before encryping:
+
+```rust
+let mut encrypted_data_bytes: Vec<u8> = Vec::new();
+let data = string.as_bytes();
+
+match tpm_provider.lock().unwrap().encrypt_data(data) {
+    Ok(encrypted_data) => {
+        encrypted_data_bytes = encrypted_data;
+        println!("\nEncrypted '{}' as Byte Array: \n{:?}", string, encrypted_data_bytes);
+    }
+    Err(e) => println!("Failed to encrypt data: {:?}", e),
+}
+```
+
+### Decryption
+
+The previoulsy encrypted data has to be decrypted to, so this is how to do it:
+
+```rust
+match tpm_provider.lock().unwrap().decrypt_data(&encrypted_data_bytes) {
+    Ok(decrypted_data) => println!("DecryptedData of {}: \n{:?}", String::from_utf8_lossy(&encrypted_data_bytes).to_string(),   
+        String::from_utf8(decrypted_data)),
+    Err(e) => println!("Failed to decrypt data: {:?}", e),
+}
+```
+
+### Signing
+
+Here, the string `"Hello, world!"` is signed:
+
+```rust
+let mut signed_data_bytes: Vec<u8> = Vec::new(); 
+let data = string.as_bytes();
+
+match tpm_provider.lock().unwrap().sign_data(data) {
+    Ok(signature) => {
+        signed_data_bytes = signature.clone(); 
+        println!("Signature of '{}' => \n{:?}", string, signature)},
+    Err(e) => println!("Failed to sign data: {:?}", e),
+}; 
+```
+
+
+### Verifying
+
+Verifying a signature is important to make sure that a document is valid and not changed by a third party.
+Here is an example of how to verify the just signed data and check if the signature is valid or invalid:
+
+```rust
+let data = string.as_bytes();
+
+match tpm_provider.lock().unwrap().verify_signature(data, &signed_data_bytes) {
+    Ok(valid) => {
+        if valid {
+            println!("Signature of {} and {:?} is valid", string, signed_data_bytes);
+        } else {
+            println!("Signature of {} and {:?} is invalid", string, signed_data_bytes);
+        }
+    }
+    Err(e) => println!("Failed to verify signature: {:?}", e),
+}
+```
+
 
 ## Implementation
 
@@ -237,7 +378,7 @@ pub fn rust_crypto_call_encrypt_data(key_id: String, data: Vec<u8>, algorithm: S
 
 ### Creating a key
 
-In Swift, the function SecKeyCreateRandomKey from the Security framework is used to generate a new public-private key pair. 
+In Swift, the function `SecKeyCreateRandomKey` from the Security framework is used to generate a new public-private key pair. 
 The function `get_public_key_from_private_key` returns a SecKeyCopyPublicKey that is the public key associated with the given private key.
 `SEKeyPair` is a structure used to store the public and private key together.
 
@@ -252,9 +393,17 @@ guard let publicKey = get_public_key_from_private_key(private_key: privateKeyRef
         
 let keyPair = SEKeyPair(publicKey: publicKey, privateKey: privateKeyReference)
 ```
-
+The following code is from `provider.rs` in the Crypto Abstraction Layer. 
+It calls the Swift function that contains the code shown above (`rustcall_create_key` which calls `create_key` from `SecureEnclaveManager.swift`).
+Before the key is created, the algorithms are checked for creating the key with its matching algorithm.
+Here, it is checked if there is any error, and if not, `Ok(())` is returned to indicate creating loading the key was successful:
 ```rust
-
+let keypair = apple_secure_enclave_bindings::provider::rust_crypto_call_create_key(self.key_id.clone(), key_algorithm_type);
+    if keypair.0 {
+        Err(SecurityModuleError::InitializationError(keypair.1.to_string()))
+    } else {
+        Ok(())
+    }
 ```
 
 ### Loading a key
@@ -265,9 +414,15 @@ Returns one or more keychain items that match a search query, or copies attribut
 let status = SecItemCopyMatching(query as CFDictionary, &item)
 ```
 
-
+The following code is from `provider.rs` in the Crypto Abstraction Layer. 
+It calls the Swift function that contains the code shown above (`rustcall_load_key` which calls `load_key` from `SecureEnclaveManager.swift`).
+Here, it is checked if there is any error, and if not, `Ok(())` is returned to indicate that loading the key was successful:
 ```rust
-
+let load_key = apple_secure_enclave_bindings::provider::rust_crypto_call_load_key(_key_id.to_string(), algorithm, hash);
+if load_key.0 {
+    return Err(SecurityModuleError::InitializationError(load_key.1.to_string()))
+}
+return Ok(())
 ```
 
 
@@ -291,14 +446,24 @@ if #available(macOS 10.15, *) {
 }
 ```
 
-```rust
 
+The following code is from `provider.rs` in the Crypto Abstraction Layer. 
+It calls the Swift function that contains the code shown above (`initialize_module` from `SecureEnclaveManager.swift`).
+Here, it is checked if the return value matches `true` to show if inizialization has been successful or if an error has to be returned:
+```rust
+let initialization_result = apple_secure_enclave_bindings::provider::rust_crypto_call_initialize_module();
+match initialization_result {
+    true => Ok(()),
+    false => Err(SecurityModuleError::InitializationError(
+        "Failed to initialize module".to_string(),
+    )),
+}
 ```
 
 
 ### Encryption
 
-In Swift, the function SecKeyCreateEncryptedData from the Security framework is used to encrypt a block of data using a public key and a specified algorithm:
+In Swift, the function `SecKeyCreateEncryptedData` from the Security framework is used to encrypt a block of data using a public key and a specified algorithm:
 ```swift
 let result = SecKeyCreateEncryptedData(public_key, algorithm, data, &error)
 ```
@@ -319,7 +484,7 @@ if encrypted_data.0 {
 
 ### Decryption
 
-To decrypt a block of data using a private key and specified algorithm from the previously encrypted data, the function SecKeyCreateDecryptedData from the Security framework is used:
+To decrypt a block of data using a private key and specified algorithm from the previously encrypted data, the function `SecKeyCreateDecryptedData` from the Security framework is used:
 ```swift
 let result = SecKeyCreateDecryptedData(private_key, algorithm, data, &error)
 ```
@@ -399,7 +564,7 @@ In addition, it is used when the hash for the signature is not supported.
 - `SignatureVerificationError`: is used when there is an error occurring while trying to verify the signature. 
 This can happen for example due to an invalid message 
 
-- `InitializationError`: 
+- `InitializationError`: is used when the Mach-O file isn't signed so the Secure Enclave couldn't be accessed.
 
 - `CreateKeyError`: is used to indicate that there is any error while trying to create a keypair.
 
