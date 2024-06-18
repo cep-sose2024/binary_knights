@@ -98,6 +98,9 @@ All the information provided here is taken from Apple`s [Secure Enclave page](ht
 The wrapper supports Macs with an Apple Silicon processor or Macs with an Intel processor that have a [T2 security chip](https://support.apple.com/en-us/103265 "T2 security chip").
 The same also applies to MacBooks. In addition, the MacBook Pro 2016 and 2017, which have Touch Bar (these have a T1 security chip), are **not** supported.
 
+### Code Compatibility
+
+The code only works for macOS so far, but it can be assumed, that it works for iOS too, as both operating systems share the same API.
 
 ## Features
 
