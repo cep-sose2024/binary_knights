@@ -2,7 +2,7 @@
 
 
 <p align=center>
-    <a href="https://github.com/cep-sose2024/binary_knights/" target="_blank"><img src="documentation/pictures/logoBlack.png" style="width:20%;"></a>
+    <a href="https://github.com/cep-sose2024/binary_knights/" target="_blank"><img src="pictures/logoBlack.png" style="width:20%;"></a>
 </p>
 
 A Rust- and Swift-based Wrapper for a Crypto Abstraction Layer that accesses the iOS and macOS Secure Enclave Processor.
@@ -35,7 +35,7 @@ Security can be guaranteed as the Secure Enclave Processor (main computing power
 
 ## Architecture
 
-<img src="documentation/pictures/Component_diagram.png" style="width:50%">
+<img src="pictures/Component_diagram.png" style="width:50%">
 
 ### Crypto Abstraction Layer:
 
