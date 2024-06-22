@@ -435,17 +435,19 @@ In this function, it is checked if the macOS version is 10.15 or later by using 
 Also, it is checked if the device supports Secure Enclave access. 
 If the Secure Enclave is available, the function returns true, and if not, it returns false.
 ```swift
-if #available(macOS 10.15, *) {
-    do{
-        guard SecureEnclave.isAvailable else {
-            throw SecureEnclaveError.runtimeError("Secure Enclave is unavailable on this device. ")
+func initialize_module() -> Bool  {
+    do {
+        if #available(macOS 10.15, iOS 14.0, *)  {
+            guard SecureEnclave.isAvailable else {
+                throw SecureEnclaveError.runtimeError("Secure Enclave is unavailable on this device. Please make sure you are using a device with Secure Enclave and macOS higher 10.15 or iOS higher 14.0")
+            }
+            return true
+        } else {
+            return false
         }
-        return true
     }catch{
         return false
     }
-} else {
-    return true
 }
 ```
 
