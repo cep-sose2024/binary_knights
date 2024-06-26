@@ -19,6 +19,7 @@ This is a project in cooperation with j&s-soft GmbH and the Mannheim University 
 - [Features](#features)
 - [Code Usage](#code-usage)
 - [Implementation](#implementation)
+- [Testing](#testing)
 - [Dependencies](#depenencies)
 - [License](#license)
 
@@ -607,7 +608,7 @@ As there are difficulties to pass errors over the Rust-Swift-Bridge, the error m
 The string and a boolean that is `true` if there is any error are returned and then also passed to Rust as a String.
 
 ## Testing
-j&s-soft had provided the entire team with tests to test the basic functions of the Crypto Abstraction Layer. These tests could be executed in theory with the command `cargo test --features macos` and could also be implemented in a CI/CD pipeline, but Apple has problems with security precautions when executing applications that access security-relevant interfaces. As already mentioned in the chapter #Secure Enclave, the instance to be executed must be signed with an Apple developer certificate and so-called entitlements. Since `cargo test` executes the build process from the beginning and immediately starts testing, we are not aware of any anchor point where we can provide an executable file with the Apple Developer certificate and the entitlements in the build process. As a result, `cargo test` only receives return values from the operating system that contain nothing but error messages and block the generation of a key, for example. 
+j&s-soft had provided the entire team with tests to test the basic functions of the Crypto Abstraction Layer. These tests could be executed in theory with the command `cargo test --features macos` and could also be implemented in a CI/CD pipeline, but Apple has problems with security precautions when executing applications that access security-relevant interfaces. As mentioned in the chapter [Apple Developer Account](#apple-developer-account), the instance to be executed must be signed with an Apple developer certificate and so-called entitlements. Since `cargo test` executes the build process from the beginning and immediately starts testing, we are not aware of any anchor point where we can provide an executable file with the Apple Developer certificate and the entitlements in the build process. As a result, `cargo test` only receives return values from the operating system that contain nothing but error messages and block the generation of a key, for example. 
 
 Our alternative:
 For each potentialy pull-request state of our crypto-abstraction layer, we have taken certain test precautions to at least manually perform test operations. We have created a checklist with the following checks: 
