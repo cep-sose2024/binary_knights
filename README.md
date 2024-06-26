@@ -168,7 +168,31 @@ For having any access on the Secure Enclave, an [Apple Developer Account](https:
 Also, it plays a major role for the signing process, described in [Commands](#commands).
 The role for the account has to be set to **App Manager**.
 The Apple Developer Account is also necessary for developing the Swift code, for example for using the Keychain Services to store cryptographic keys securely.
-Furthermore, the entitlements can only be set by using the right Bundle Identifier. 
+Furthermore, the entitlements can only be set by using the right Bundle Identifier.
+
+#### Example for an entilements file
+```XML
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>com.apple.application-identifier</key>
+        <string>[Teamname].[Bundle identifier]</string>
+        <key>com.apple.developer.team-identifier</key>
+        <string>[Teamname]</string>     
+        <key>com.apple.security.app-sandbox</key>
+        <false/>
+        <key>com.apple.security.files.user-selected.read-only</key>
+        <true/>
+        <key>com.apple.security.get-task-allow</key>
+        <true/>
+        <key>keychain-access-groups</key>
+        <array>
+                <string>[Teamname].[Bundle identifier]</string>
+        </array>
+</dict>
+</plist>
+```
 
 To do this, the Xcode project has to be opened and under **Signing & Capabilities**, the Bundle Identifier needs to be set to **de.jssoft.BinaryKnights**.
 Also, it is important that the development team is not the Personal Team but the j&s soft team. 
@@ -176,6 +200,9 @@ This is not possible if the role of the Developer Account isn't set to App Manag
 If the error message is "Failed Registering Bundle Identifier" and "No profiles for 'XXX' were found", then it's probably because of the missing role in the Developer Account. 
 To add an account, logging in with the Apple-ID is necessary.
 
+At least, please be sure that you installed a up to date profile on your developement device (for example Mac), with the right Developement-Team and the right bundle identifier. Whit this step you show your system, that an executable with the same assigned bundle identifier und the developement team is allowed to access the KeyChain-Services. 
+
+<img src="pictures/profile.jpeg" alt="picture example for profile" height="280px"></img>
 
 
 ### Commands
@@ -597,42 +624,42 @@ In contrast to Xcode and Swift, Rust does not provide native support for post-bu
 ### Example to read a file and convert it in &[u8] datatype
 
 ``` rust
-     // Path to the file
-     let path = Path::new("path/to/file");
-    
-     // Open the file
-     let mut file = File::open(&path);
+// Path to the file
+let path = Path::new("path/to/file");
 
-     let mut buffer = Vec::new();
-     
-     // Read the whole content of the File and store it in a Vec<u8>
-     file.expect("Cont open file").read_to_end(&mut buffer);
-     
-     let buffer_slice: &[u8] = &buffer;
-     
-     // You can use buffer_slice to test the following crypto-operations such as encrypt, decrypt, sign and verify
-     
-     // Signing Data
-     let mut signed_data_bytes: Vec<u8> = Vec::new();
-     let data = string.as_bytes();
-     match tpm_provider.lock().unwrap().sign_data(data) {
-        Ok(signature) => {
-            signed_data_bytes = signature.clone(); 
-            println!("Signature of '{}' => \n{:?}", string, signature)},
-        Err(e) => println!("Failed to sign data: {:?}", e),
-     }; 
+// Open the file
+let mut file = File::open(&path);
 
-     // Verifying Signature
-    match tpm_provider.lock().unwrap().verify_signature(buffer_slice, &signed_data_bytes) {
-        Ok(valid) => {
-            if valid {
-                println!("Signature of {} and {:?} is valid", string, signed_data_bytes);
-            } else {
-                println!("Signature of {} and {:?} is invalid", string, signed_data_bytes);
-            }
-        }
-        Err(e) => println!("Failed to verify signature: {:?}", e),
+let mut buffer = Vec::new();
+
+// Read the whole content of the File and store it in a Vec<u8>
+file.expect("Cont open file").read_to_end(&mut buffer);
+
+let buffer_slice: &[u8] = &buffer;
+
+// You can use buffer_slice to test the following crypto-operations such as encrypt, decrypt, sign and verify
+
+// Signing Data
+let mut signed_data_bytes: Vec<u8> = Vec::new();
+let data = string.as_bytes();
+match tpm_provider.lock().unwrap().sign_data(data) {
+Ok(signature) => {
+    signed_data_bytes = signature.clone(); 
+    println!("Signature of '{}' => \n{:?}", string, signature)},
+Err(e) => println!("Failed to sign data: {:?}", e),
+}; 
+
+// Verifying Signature
+match tpm_provider.lock().unwrap().verify_signature(buffer_slice, &signed_data_bytes) {
+Ok(valid) => {
+    if valid {
+        println!("Signature of {} and {:?} is valid", string, signed_data_bytes);
+    } else {
+        println!("Signature of {} and {:?} is invalid", string, signed_data_bytes);
     }
+}
+Err(e) => println!("Failed to verify signature: {:?}", e),
+}
 ```
 
 
