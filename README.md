@@ -579,6 +579,61 @@ This can happen for example due to an invalid message
 As there are difficulties to pass errors over the Rust-Swift-Bridge, the error messages are converted into a string. 
 The string and a boolean that is `true` if there is any error are returned and then also passed to Rust as a String.
 
+## Testing
+j&s-soft had provided the entire team with tests to test the basic functions of the Crypto Abstraction Layer. These tests could be executed in theory with the command `cargo test --features macos` and could also be implemented in a CI/CD pipeline, but Apple has problems with security precautions when executing applications that access security-relevant interfaces. As already mentioned in the chapter #Secure Enclave, the instance to be executed must be signed with an Apple developer certificate and so-called entitlements. Since `cargo test` executes the build process from the beginning and immediately starts testing, we are not aware of any anchor point where we can provide an executable file with the Apple Developer certificate and the entitlements in the build process. As a result, `cargo test` only receives return values from the operating system that contain nothing but error messages and block the generation of a key, for example. 
+
+Our alternative:
+For each potentialy pull-request state of our crypto-abstraction layer, we have taken certain test precautions to at least manually perform test operations. We have created a checklist with the following checks: 
+- Perform signing and verification of a file (no string with "Hello World") and check for successful execution of the operations. 
+- Encrypt and decrypt a file (no string with "Hello World") and ensure that the operations are carried out successfully. 
+- Each if/else query is run once
+- Each error is provoked once and attention is paid to whether the error message matches the provoked error.
+- Every algorithm and every hash combination is run through and checked for the correct behavior. 
+- Note: It is normal for an error message to appear if an RSA 512 bit key has been created and operations are not carried out with SHA1 or SHA224, and an RSA 1024 bit key is not carried out with SHA256 and SHA384.
+
+Our approach to getting `cargo test` to run later: 
+In contrast to Xcode and Swift, Rust does not provide native support for post-build scripts.  However, there are crates from the platform <a href="https://crates.io/">crates.io</a> that allow this process to be implemented in Rust, such as the <a href="https://crates.io/crates/cargo-post">"cargo-post"</a> crate. This is supposed to offer the possibility to write a post-build script, which in our case could take over the signing of the executable file. Unfortunately, we were unable to implement this solution due to a lack of time and therefore cannot guarantee that it will work. 
+
+### Example to read a file and convert it in &[u8] datatype
+
+``` rust
+     // Path to the file
+     let path = Path::new("path/to/file");
+    
+     // Open the file
+     let mut file = File::open(&path);
+
+     let mut buffer = Vec::new();
+     
+     // Read the whole content of the File and store it in a Vec<u8>
+     file.expect("Cont open file").read_to_end(&mut buffer);
+     
+     let buffer_slice: &[u8] = &buffer;
+     
+     // You can use buffer_slice to test the following crypto-operations such as encrypt, decrypt, sign and verify
+     
+     // Signing Data
+     let mut signed_data_bytes: Vec<u8> = Vec::new();
+     let data = string.as_bytes();
+     match tpm_provider.lock().unwrap().sign_data(data) {
+        Ok(signature) => {
+            signed_data_bytes = signature.clone(); 
+            println!("Signature of '{}' => \n{:?}", string, signature)},
+        Err(e) => println!("Failed to sign data: {:?}", e),
+     }; 
+
+     // Verifying Signature
+    match tpm_provider.lock().unwrap().verify_signature(buffer_slice, &signed_data_bytes) {
+        Ok(valid) => {
+            if valid {
+                println!("Signature of {} and {:?} is valid", string, signed_data_bytes);
+            } else {
+                println!("Signature of {} and {:?} is invalid", string, signed_data_bytes);
+            }
+        }
+        Err(e) => println!("Failed to verify signature: {:?}", e),
+    }
+```
 
 
 ## Dependencies
